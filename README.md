@@ -2,11 +2,13 @@
 
 Grupo A54
 
-Pedro Lindeza 80831 pedro.lindeza@ist.utl.pt
-
-Filipe Azevedo 82468 filipepazevedo@gmail.com
-
-Martim Zanatti 82517 martim_zanatti_5@hotmail.com
-
--------------------------------------------------------------------------------
+------------------------------------------------------------
+ Nome           |  Número |      Email                     |
+------------------------------------------------------------
+ Pedro Lindeza  |  80831  | pedro.lindeza@ist.utl.pt       |
+------------------------------------------------------------
+ Filipe Azevedo |  82468  | filipepazevedo@gmail.com       |
+------------------------------------------------------------
+ Martim Zanatti |  82517  | martim_zanatti_5@hotmail.com   |
+------------------------------------------------------------
 
