@@ -1,15 +1,12 @@
 # Projeto de Sistemas Distribuídos 2016-2017 #
 
-Grupo CXX
-*(preencher com identificador de grupo e depois apagar esta linha)*
+Grupo A54
 
-... ... ...
+Pedro Lindeza 80831 pedro.lindeza@ist.utl.pt
 
-... ... ...
+Filipe Azevedo 82468 filipepazevedo@gmail.com
 
-... ... ...
-*(preencher com nome, número e email de membro do grupo e depois apagar esta linha)*
-
+Martim Zanatti 82517 martim_zanatti_5@hotmail.com
 
 -------------------------------------------------------------------------------
-**FIM**
+
