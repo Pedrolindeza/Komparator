@@ -116,6 +116,7 @@ public class BuyProductIT extends BaseIT {
 		client.buyProduct("Y2", 0);
 	}
 	
+	
 	@Test(expected = BadQuantity_Exception.class)
 	public void buyProductNegativeQuantityTest() throws BadProductId_Exception, BadQuantity_Exception, InsufficientQuantity_Exception {
 		client.buyProduct("Z3", -1);
