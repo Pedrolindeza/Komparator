@@ -126,29 +126,5 @@ public class SearchProductsIT extends BaseIT {
 			assertEquals("Baseball", pv.getDesc());
 		}
 	}
-	
-	@Test
-	public void searchProductsNormal() throws BadText_Exception {
-		List<ProductView> l = client.searchProducts("Baseball");
-		List<ProductView> baseballList = new ArrayList<ProductView>();
-		ProductView product = new ProductView();
-		product.setId("Y2");
-		product.setDesc("Baseball");
-		product.setPrice(20);
-		product.setQuantity(20);
-
-		baseballList.add(product);
-		
-		product.setId("Y3");
-		product.setDesc("Baseball");
-		product.setPrice(40);
-		product.setQuantity(40);
-
-		baseballList.add(product);
-		
-		for(ProductView pv : l) {
-			assertTrue(baseballList.contains(pv));
-		}
-	}
 
 }

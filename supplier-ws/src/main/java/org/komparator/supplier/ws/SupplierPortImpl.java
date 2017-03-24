@@ -30,44 +30,87 @@ public class SupplierPortImpl implements SupplierPortType {
 
 	// Main operations -------------------------------------------------------
 	@Override
-	public ProductView getProduct(String productId) throws BadProductId_Exception {
-		// check product id
+	 public ProductView getProduct(String productId) throws BadProductId_Exception {
+	  // check product id
+	 
 		if (productId == null)
 			throwBadProductId("Product identifier cannot be null!");
+		
 		productId = productId.trim();
-		if (productId.length() == 0)
-			throwBadProductId("Product identifier cannot be empty or whitespace!");
+	  
+	  	if (productId.length() == 0)
+	  		throwBadProductId("Product identifier cannot be empty or whitespace!");
 
-		// retrieve product
-		Supplier supplier = Supplier.getInstance();
-		Product p = supplier.getProduct(productId);
-		if (p != null) {
-			ProductView pv = newProductView(p);
-			// product found!
-			return pv;
-		}
-		// product not found
-		return null;
+	  	if (productId.equals("\t"))
+			throwBadProductId("Product identifier cannot be a tab!");
+		
+		if (productId.equals("\n"))
+			throwBadProductId("Product identifier cannot be a newline!");
+		
+	  // retrieve product
+	  Supplier supplier = Supplier.getInstance();
+	  Product p = supplier.getProduct(productId);
+	  if (p != null) {
+	   ProductView pv = newProductView(p);
+	   // product found!
+	   return pv;
+	  }
+	  // product not found
+	  return null;
 	}
 	@Override
 	public List<ProductView> searchProducts(String descText) throws BadText_Exception {
-		// TODO
 		
+		List<ProductView> match = new ArrayList<ProductView>();
+		List<ProductView> all = listProducts();
 		
+		if(descText == null)
+			throwBadText("Null descrition text.");
 		
+		if(descText.isEmpty())
+			throwBadText("Empty descrition text.");
 		
-		return null;
+		if(descText.trim().isEmpty())
+			throwBadText("Only empty spaces in descrition text.");
+		
+		if(descText.equals("\t"))
+			throwBadText("Tab received in descrition text.");
+		
+		if(descText.equals("\n"))
+			throwBadText("Paragraph received in descrition text.");
+		
+		for(ProductView pv : all){
+			if( descText.equals( pv.getDesc() ) ){
+				match.add(pv);
+			}	
+		}
+		return match;
 	}
 
 	@Override
 	public String buyProduct(String productId, int quantity)
 			throws BadProductId_Exception, BadQuantity_Exception, InsufficientQuantity_Exception {
-		// TODO
+		
+		Supplier s = Supplier.getInstance();
+		String pid = null;
 		
 		
+		// productId is tested in getProduct
+		ProductView product = getProduct(productId); 
 		
+		if (product == null)
+			throwBadProductId("Product not found.");
 		
-		return null;
+		if(quantity <= 0)
+			throwBadQuantity("Quantity can't be zero or negative.");
+		
+		try {
+			pid = s.buyProduct(productId, quantity);
+		} catch (QuantityException e) {
+			throwInsufficientQuantity("That quantity isn't available.");
+		}
+		
+		return pid;
 	}
 
 	// Auxiliary operations --------------------------------------------------
