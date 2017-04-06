@@ -80,7 +80,7 @@ public class SupplierPortImpl implements SupplierPortType {
 			throwBadText("Paragraph received in descrition text.");
 		
 		for(ProductView pv : all){
-			if( descText.equals( pv.getDesc() ) ){
+			if( descText.contains( pv.getDesc() ) ){
 				match.add(pv);
 			}	
 		}
@@ -220,7 +220,6 @@ public class SupplierPortImpl implements SupplierPortType {
 	}
 
 	/** Helper method to throw new BadText exception */
-	@SuppressWarnings("unused")
 	private void throwBadText(final String message) throws BadText_Exception {
 		BadText faultInfo = new BadText();
 		faultInfo.message = message;
@@ -228,7 +227,6 @@ public class SupplierPortImpl implements SupplierPortType {
 	}
 
 	/** Helper method to throw new BadQuantity exception */
-	@SuppressWarnings("unused")
 	private void throwBadQuantity(final String message) throws BadQuantity_Exception {
 		BadQuantity faultInfo = new BadQuantity();
 		faultInfo.message = message;
@@ -236,7 +234,6 @@ public class SupplierPortImpl implements SupplierPortType {
 	}
 
 	/** Helper method to throw new InsufficientQuantity exception */
-	@SuppressWarnings("unused")
 	private void throwInsufficientQuantity(final String message) throws InsufficientQuantity_Exception {
 		InsufficientQuantity faultInfo = new InsufficientQuantity();
 		faultInfo.message = message;
