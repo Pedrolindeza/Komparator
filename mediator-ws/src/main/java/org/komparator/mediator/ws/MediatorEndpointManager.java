@@ -77,7 +77,7 @@ public class MediatorEndpointManager {
 			if (verbose) {
 				System.out.printf("Starting %s%n", wsURL);
 			}
-			endpoint.publish(wsURL);
+			//endpoint.publish(wsURL);
 		} catch (Exception e) {
 			endpoint = null;
 			if (verbose) {
