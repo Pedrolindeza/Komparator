@@ -25,9 +25,15 @@ import org.komparator.supplier.ws.SupplierService;
  */
 public class SupplierClient implements SupplierPortType {
 
+	/** UDDI naming server location */
+	private String uddiURL = null;
+	
+	/** Web Service name */
+	private String wsName = null;
+	
 	/** WS service */
 	SupplierService service = null;
-
+	
 	/** WS port (port type is the interface, port is the implementation) */
 	SupplierPortType port = null;
 
@@ -70,6 +76,16 @@ public class SupplierClient implements SupplierPortType {
 			requestContext.put(ENDPOINT_ADDRESS_PROPERTY, wsURL);
 		}
 	}
+	
+	public SupplierClient(String uddiURL, String wsName, String wsURL) throws SupplierClientException {
+		this.uddiURL = uddiURL;
+		this.wsName = wsName;
+		this.wsURL = wsURL;
+		createStub();
+		
+	}
+	  
+	
 
 	// remote invocation methods ----------------------------------------------
 
@@ -112,6 +128,22 @@ public class SupplierClient implements SupplierPortType {
 	@Override
 	public List<PurchaseView> listPurchases() {
 		return port.listPurchases();
+	}
+
+	public String getUddiURL() {
+		return uddiURL;
+	}
+
+	public void setUddiURL(String uddiURL) {
+		this.uddiURL = uddiURL;
+	}
+
+	public String getWsName() {
+		return wsName;
+	}
+
+	public void setWsName(String wsName) {
+		this.wsName = wsName;
 	}
 
 }

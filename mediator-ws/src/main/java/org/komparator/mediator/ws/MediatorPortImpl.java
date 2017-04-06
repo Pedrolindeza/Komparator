@@ -4,6 +4,16 @@ import javax.jws.WebService;
 
 // TODO annotate to bind with WSDL
 // TODO implement port type interface
+@WebService(
+		endpointInterface = "org.komparator.supplier.ws.MediatorPortType", 
+		wsdlLocation = "mediator.1_0.wsdl", 
+		name = "MediatorWebService", 
+		portName = "MediatorPort", 
+		targetNamespace = "http://ws.mediator.komparator.org/", 
+		serviceName = "MediatorService")
+
+
+
 public class MediatorPortImpl {
 
 	// end point manager

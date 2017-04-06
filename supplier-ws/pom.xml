@@ -18,11 +18,17 @@
         <maven.compiler.target>1.8</maven.compiler.target>
 
         <mainclass>org.komparator.supplier.ws.SupplierApp</mainclass>
+        
+        <ws.i>1</ws.i>
 
-        <ws.host>localhost</ws.host>
-        <ws.port>8081</ws.port>
-        <ws.url>http://${ws.host}:${ws.port}/supplier-ws/endpoint</ws.url>
-        <uddi.url>http://localhost:9090</uddi.url>
+    	<ws.host>localhost</ws.host>
+    	<ws.port>808${ws.i}</ws.port>
+    	<ws.url>http://${ws.host}:${ws.port}/supplier-ws/endpoint</ws.url>
+    	<uddi.url>http://localhost:9090</uddi.url>
+    	<ws.name>A54_Supplier${ws.i}</ws.name>
+
+        
+       
     </properties>
 
     <dependencies>
