@@ -23,11 +23,9 @@ public class MediatorEndpointManager {
 	private String wsURL = null;
 
 	/** Port implementation */
-// TODO uncomment after port implementation is done
 	private MediatorPortImpl portImpl = new MediatorPortImpl(this);
 
 	/** Obtain Port implementation */
-// TODO uncomment after port implementation is done
 	public MediatorPortType getPort() {
 		return portImpl;
 	}
@@ -71,13 +69,11 @@ public class MediatorEndpointManager {
 
 	public void start() throws Exception {
 		try {
-			// publish end point
-// TODO uncomment after port implementation is done
-//			endpoint = Endpoint.create(this.portImpl);
+			endpoint = Endpoint.create(this.portImpl);
 			if (verbose) {
 				System.out.printf("Starting %s%n", wsURL);
 			}
-			//endpoint.publish(wsURL);
+			endpoint.publish(wsURL);
 		} catch (Exception e) {
 			endpoint = null;
 			if (verbose) {
@@ -117,7 +113,6 @@ public class MediatorEndpointManager {
 				System.out.printf("Caught exception when stopping: %s%n", e);
 			}
 		}
-// TODO uncomment after port implementation is done
 		this.portImpl = null;
 		unpublishFromUDDI();
 	}

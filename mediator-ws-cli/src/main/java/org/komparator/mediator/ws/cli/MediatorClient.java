@@ -21,8 +21,7 @@ import org.komparator.mediator.ws.MediatorService;
 import org.komparator.mediator.ws.NotEnoughItems_Exception;
 import org.komparator.mediator.ws.ShoppingResultView;
 
-// TODO uncomment after generate-sources
-//import org.komparator.mediator.ws.*;
+import org.komparator.mediator.ws.*;
 
 import pt.ulisboa.tecnico.sdis.ws.uddi.UDDINaming;
 
@@ -110,7 +109,6 @@ public class MediatorClient implements MediatorPortType {
     private void createStub() {
         if (verbose)
             System.out.println("Creating stub ...");
-// TODO uncomment after generate-sources
         service = new MediatorService();
         port = service.getMediatorPort();
 
@@ -126,8 +124,7 @@ public class MediatorClient implements MediatorPortType {
 
 
     // remote invocation methods ----------------------------------------------
-    
-    // TODO uncomment after generate-sources
+  
     
     @Override
 	public void clear() {

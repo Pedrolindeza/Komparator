@@ -30,8 +30,6 @@ import pt.ulisboa.tecnico.sdis.ws.uddi.UDDIRecord;
 		serviceName = "MediatorService"
 )
 
-
-
 public class MediatorPortImpl implements MediatorPortType {
 
 	// end point manager
@@ -214,15 +212,10 @@ public class MediatorPortImpl implements MediatorPortType {
 								itemView.setItemId(itemId);
 								itemView.setDesc(product.getDesc());
 								itemView.setPrice(product.getPrice()*itemQty);
-								
 								newItem.setItem(itemView);
-								
 								newItem.setQuantity(itemQty);
-								
-								
 								cart.getItems().add(newItem);
 							}
-							
 						}
 					}
 				} catch(BadProductId_Exception e) {
@@ -319,20 +312,16 @@ public class MediatorPortImpl implements MediatorPortType {
 				for(UDDIRecord record : records) {
 					suppliers.add(new SupplierClient(record.getUrl(), record.getOrgName()));
 				
-			}
-			
+				}
 			} 
 			catch (UDDINamingException | SupplierClientException e) {
 				e.printStackTrace();
 			}
-		
 		}
 		return suppliers;
 	}
     
 	// Exception helpers -----------------------------------------------------
-
-    // TODO
 	
 	/** Helper method to throw new NotEnoughItems exception */
 	private void throwNotEnoughItems(final String message) throws NotEnoughItems_Exception {
