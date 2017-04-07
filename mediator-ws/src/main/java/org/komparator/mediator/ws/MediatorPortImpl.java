@@ -45,6 +45,8 @@ public class MediatorPortImpl implements MediatorPortType {
 	
 	private List<CartView> cartsList = new ArrayList<CartView>();
 	
+	private List<ShoppingResultView> shoppingResultsList = new ArrayList<ShoppingResultView>();
+	
 	
 	private void resetCartsList() {
 		this.cartsList = new ArrayList<CartView>();
@@ -155,95 +157,104 @@ public class MediatorPortImpl implements MediatorPortType {
 	}
 	
 	@Override
-	public ShoppingResultView buyCart(String cartId, String creditCarNr) throws EmptyCart_Exception, InvalidCartId_Exception, InvalidCreditCard_Exception  {
+	public ShoppingResultView buyCart(String cartId, String creditCardNr) throws EmptyCart_Exception, InvalidCartId_Exception, InvalidCreditCard_Exception  {
 		
-		if (!acceptCart(cartId)) {
-			throwInvalidCartId("null");
+		if (cartId == null || cartId == "" || cartId.trim().length() == 0) {
+			throwInvalidCartId("The cart ID you specified is invalid.");
 		}
 	  
-		if (!acceptCartID(creditCardNr)) {
-			throwInvalidCreditCard("Invalid CreditCarId");
+		if (creditCardNr == null || creditCardNr == "") {
+			throwInvalidCreditCard("The credit card ID you specified is invalid");
 		}
 	  
-		boolean purchaseFinalizes = false;
-		boolean uncomplete = false;
+		String PurchaseId = null;
+		
+		boolean endPurchases = false;
+		boolean incomplete = false;
 	  
-	  ShoppingResultView shoppingResusltView = new ShoppingResultView();
+	  ShoppingResultView shoppingResultView = new ShoppingResultView();
 	  
-	  shoppingResusltView.setResult(Result.EMPTY);
+	  shoppingResultView.setResult(Result.EMPTY);
 	  
 	  try{
 	   
-	   CreditCardClient creditClientCard = new CreditCardClient("http://ws.sd.rnl.tecnico.ulisboa.pt.8080/cc");
+		  CreditCardClient creditClientCard = new CreditCardClient("http://ws.sd.rnl.tecnico.ulisboa.pt.8080/cc");
 	   
-	   if (creditClientCard.validateNumber(creditCardNr)) {
+		  if (creditClientCard.validateNumber(creditCardNr)) {
+		   
+			  CartView cartView = null;
+		   
+			  for(CartView cart : cartsList) {
+				  if(cart.getCartId() == cartId) {
+					  cartView = cart;
+				  }
+			  }
+			  
+			  if(cartView == null) {
+				  
+				  throwInvalidCartId("Invalid CartId");
+				  
+			  }
+			  
+			  for(CartItemView cartItemView : cartView.getItems()) {
+				  
+				  try {
+					  
+					  SupplierClient client = new SupplierClient(endpointManager.getUddiNaming().lookup(cartItemView.getItem().getItemId().getSupplierId())); 
+					  PurchaseId = client.buyProduct(cartItemView.getItem().getItemId().getProductId(), cartItemView.getQuantity());
+					  shoppingResultView.getPurchasedItems().add(cartItemView);
+					  int cost = cartItemView.getQuantity() * cartItemView.getItem().getPrice();
+					  shoppingResultView.setTotalPrice(shoppingResultView.getTotalPrice() + cost);
+					  endPurchases = true;
+					  
+				  } catch(SupplierClientException e) {
+					  
+					  shoppingResultView.getDroppedItems().add(cartItemView);
+					  incomplete = true;
+					  
+				  } catch (UDDINamingException un) {
+					  
+					  shoppingResultView.getDroppedItems().add(cartItemView);
+					  incomplete = true;
+					  
+				  }  catch(BadProductId_Exception be){
+					  
+					  shoppingResultView.getDroppedItems().add(cartItemView);
+					  incomplete = true;
+					  
+				  } catch(InsufficientQuantity_Exception ie) {
+					  
+					  shoppingResultView.getDroppedItems().add(cartItemView);
+					  incomplete = true;
+					  
+				  }
+			  }
 	    
-	    Cart cart = mediator.getCart(cartId);
-	    
-	    if(cart == null) {
-	     
-	     throwInvalidCartId("Invalid CardId");
-	     
-	    }
-	    
-	    for(CartItemView cartItemView : cart.getCartItemViewList()) {
-	     
-	    	try {
-	      
-	    		SupplierClient client = new SupplierClient(
-	    		endpointManager.getUddiNaming().lookup(getSupplierIdFromCartItemView(cart))); 
-				client.buyProduct(cartItemView.getItem().getItemId().getProductId(),
-				cartItemView.getQuantity());
-				shoppingResusltView.getPurchasedItems().add(cartItemView);
-				int cost = cartItemView.getQuantity() * cartItem.getItem().getPrice();
-				shoppingResusltView.setTotalPrice(shoppingResusltView.getTotalPrice() + cost);
-				purchaseFinelized = true;
-	          
-	    	} catch(SupplierClientException e) {
-	      
-	    		shoppingResusltView.getDroppedItems().add(cartItemView);
-	    		uncomplete = true;
-	      
-	    	} catch (UDDINAmingException un) {
-	      
-	    		shoppingResusltView.getDroppedItems().add(cartItemView);
-	    		uncomplete = true;
-	      
-	    	}  catch(BadProduct_Exception be){
-	      
-	    		shoppingResusltView.getDroppedItems().add(cartItemView);
-	    		uncomplete = true;
-	    	} catch(InsufficientQuantity_Exception ie) {
-	      
-	    		shoppingResusltView.getDroppedItems().add(cartItemView);
-	    		uncomplete = true;
-	      
-	    	}
-	    }
-	    
-	   } else {
-		   throwInvalidCreditCard("Invalid creditCard" );
-	   }
+		  } 
+		  
+		  else {
+			  throwInvalidCreditCard("Invalid creditCard" );
+		  }
+		  
+	  	} catch (CreditCardClientException cce) {
 	   
-	   }catch (CreditCardClientException cce) {
-	   
-		   throwInvalidCreditCard("Invalid CreditCard");
-	   }
+	  		throwInvalidCreditCard("Invalid CreditCard");
+	  	}
 	  
-	  	if(purchaseFinalizes) {
-	  		if (uncomplete) {
-	  			shoppingResusltView.setResult(Result.PARTIAL);
+	  	if(endPurchases) {
+	  		if (incomplete) {
+	  			shoppingResultView.setResult(Result.PARTIAL);
 	  		} 	
 	  		else {
-	  			shoppingResusltView.setResult(Result.COMPLETE);
+	  			shoppingResultView.setResult(Result.COMPLETE);
 	  		}
 	  	}
 	  
-	  shoppingResusltView.setId(mediator.generatePurchaseId(cartId));
-	  mediator.addPurchase(shoppingResusltView); 
-	  return shoppingResusltView;
+	  	shoppingResultView.setId(PurchaseId);
+	  	shoppingResultsList.add(shoppingResultView);
+	  	return shoppingResultView;
 	  
-	}
+}
 	
 	@Override
 	public void addToCart(String carId, ItemIdView itemId, int itemQty) throws InvalidCartId_Exception, InvalidItemId_Exception, InvalidQuantity_Exception, NotEnoughItems_Exception{
@@ -462,5 +473,6 @@ public class MediatorPortImpl implements MediatorPortType {
 		faultInfo.message = message;
 		throw new InvalidText_Exception(message, faultInfo);
 	}
+
 
 }
