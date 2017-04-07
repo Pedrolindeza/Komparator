@@ -41,11 +41,20 @@ public class MediatorPortImpl implements MediatorPortType {
 	}
 	
 	private List<CartView> cartsList = new ArrayList<CartView>();
+	
+	
+	private void resetCartsList() {
+		this.cartsList = new ArrayList<CartView>();
+	}
 
 	// Main operations -------------------------------------------------------
 
 	@Override
 	public List<ItemView> getItems(String productID) throws InvalidItemId_Exception { 
+		
+		if(productID == null || productID == "" || productID.trim().length() == 0) {
+			throwInvalidItemId("The productID you specified is invalid.");
+		}
 		
 		ItemView itemView = new ItemView();
 		
@@ -93,7 +102,7 @@ public class MediatorPortImpl implements MediatorPortType {
 			
 			
 		catch(BadProductId_Exception b){
-				
+				b.printStackTrace();
 			}
 			
 		}
@@ -115,7 +124,11 @@ public class MediatorPortImpl implements MediatorPortType {
 
 	
 	@Override
-	public List<ItemView> searchItems(String desText) throws  InvalidText_Exception {
+	public List<ItemView> searchItems(String desText) throws InvalidText_Exception {
+		
+		if(desText == null || desText == "" || desText.trim().length() == 0) {
+			throwInvalidText("That description is invalid.");
+		}
 		
 		ItemIdView itemIdView = new ItemIdView();
 		
@@ -315,6 +328,11 @@ public class MediatorPortImpl implements MediatorPortType {
 	@Override
 	public void clear(){
 		
+		Collection<SupplierClient> suppliers = getSuppliers();
+		for(SupplierClient supplier : suppliers){
+			supplier.clear();
+		}
+		resetCartsList();
 		
 	}
 	
@@ -325,7 +343,7 @@ public class MediatorPortImpl implements MediatorPortType {
 	@Override
 	public List<CartView> listCarts() {
 		
-		return null;
+		return cartsList;
 	}
 	
 	/* -------- */ 
@@ -393,11 +411,18 @@ public class MediatorPortImpl implements MediatorPortType {
 		throw new InvalidItemId_Exception(message, faultInfo);
 	}
 
-	/** Helper method to throw new InvalidItemId exception */
+	/** Helper method to throw new InvalidQuantity exception */
 	private void throwInvalidQuantity(final String message) throws InvalidQuantity_Exception {
 		InvalidQuantity faultInfo = new InvalidQuantity();
 		faultInfo.message = message;
 		throw new InvalidQuantity_Exception(message, faultInfo);
+	}
+	
+	/** Helper method to throw new InvalidText exception */
+	private void throwInvalidText(final String message) throws InvalidText_Exception {
+		InvalidText faultInfo = new InvalidText();
+		faultInfo.message = message;
+		throw new InvalidText_Exception(message, faultInfo);
 	}
 
 }
