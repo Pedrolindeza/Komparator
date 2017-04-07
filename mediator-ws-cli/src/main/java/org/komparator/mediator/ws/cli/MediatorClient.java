@@ -136,7 +136,11 @@ public class MediatorClient implements MediatorPortType {
 
     @Override
 	public String ping(String arg0) {
+<<<<<<< HEAD
     	System.out.println(" Sou burro fdgsgfdsdbfdfdgsdfscxvfedsgefdbcvdvgrfdgsf");
+=======
+    	System.out.println(" PING FUCKING ENVIADO ");
+>>>>>>> refs/remotes/origin/master
 		return port.ping(arg0);
 	}
 
