@@ -10,11 +10,15 @@ import java.util.List;
 import javax.jws.WebService;
 
 import org.komparator.supplier.ws.BadProductId_Exception;
+import org.komparator.supplier.ws.BadProduct_Exception;
 import org.komparator.supplier.ws.BadText_Exception;
+import org.komparator.supplier.ws.InsufficientQuantity_Exception;
 import org.komparator.supplier.ws.ProductView;
 import org.komparator.supplier.ws.cli.SupplierClient;
 import org.komparator.supplier.ws.cli.SupplierClientException;
 
+import pt.ulisboa.tecnico.sdis.ws.cli.CreditCardClient;
+import pt.ulisboa.tecnico.sdis.ws.cli.CreditCardClientException;
 import pt.ulisboa.tecnico.sdis.ws.uddi.UDDINaming;
 import pt.ulisboa.tecnico.sdis.ws.uddi.UDDINamingException;
 import pt.ulisboa.tecnico.sdis.ws.uddi.UDDIRecord;
@@ -22,7 +26,7 @@ import pt.ulisboa.tecnico.sdis.ws.uddi.UDDIRecord;
 
 @SuppressWarnings("unused")
 @WebService(
-		endpointInterface = "org.komparator.supplier.ws.MediatorPortType", 
+		endpointInterface = "org.komparator.mediator.ws.MediatorPortType", 
 		wsdlLocation = "mediator1_0.wsdl", 
 		name = "MediatorWebService", 
 		portName = "MediatorPort", 
@@ -153,7 +157,92 @@ public class MediatorPortImpl implements MediatorPortType {
 	@Override
 	public ShoppingResultView buyCart(String cartId, String creditCarNr) throws EmptyCart_Exception, InvalidCartId_Exception, InvalidCreditCard_Exception  {
 		
-		return null;
+		if (!acceptCart(cartId)) {
+			throwInvalidCartId("null");
+		}
+	  
+		if (!acceptCartID(creditCardNr)) {
+			throwInvalidCreditCard("Invalid CreditCarId");
+		}
+	  
+		boolean purchaseFinalizes = false;
+		boolean uncomplete = false;
+	  
+	  ShoppingResultView shoppingResusltView = new ShoppingResultView();
+	  
+	  shoppingResusltView.setResult(Result.EMPTY);
+	  
+	  try{
+	   
+	   CreditCardClient creditClientCard = new CreditCardClient("http://ws.sd.rnl.tecnico.ulisboa.pt.8080/cc");
+	   
+	   if (creditClientCard.validateNumber(creditCardNr)) {
+	    
+	    Cart cart = mediator.getCart(cartId);
+	    
+	    if(cart == null) {
+	     
+	     throwInvalidCartId("Invalid CardId");
+	     
+	    }
+	    
+	    for(CartItemView cartItemView : cart.getCartItemViewList()) {
+	     
+	    	try {
+	      
+	    		SupplierClient client = new SupplierClient(
+	    		endpointManager.getUddiNaming().lookup(getSupplierIdFromCartItemView(cart))); 
+				client.buyProduct(cartItemView.getItem().getItemId().getProductId(),
+				cartItemView.getQuantity());
+				shoppingResusltView.getPurchasedItems().add(cartItemView);
+				int cost = cartItemView.getQuantity() * cartItem.getItem().getPrice();
+				shoppingResusltView.setTotalPrice(shoppingResusltView.getTotalPrice() + cost);
+				purchaseFinelized = true;
+	          
+	    	} catch(SupplierClientException e) {
+	      
+	    		shoppingResusltView.getDroppedItems().add(cartItemView);
+	    		uncomplete = true;
+	      
+	    	} catch (UDDINAmingException un) {
+	      
+	    		shoppingResusltView.getDroppedItems().add(cartItemView);
+	    		uncomplete = true;
+	      
+	    	}  catch(BadProduct_Exception be){
+	      
+	    		shoppingResusltView.getDroppedItems().add(cartItemView);
+	    		uncomplete = true;
+	    	} catch(InsufficientQuantity_Exception ie) {
+	      
+	    		shoppingResusltView.getDroppedItems().add(cartItemView);
+	    		uncomplete = true;
+	      
+	    	}
+	    }
+	    
+	   } else {
+		   throwInvalidCreditCard("Invalid creditCard" );
+	   }
+	   
+	   }catch (CreditCardClientException cce) {
+	   
+		   throwInvalidCreditCard("Invalid CreditCard");
+	   }
+	  
+	  	if(purchaseFinalizes) {
+	  		if (uncomplete) {
+	  			shoppingResusltView.setResult(Result.PARTIAL);
+	  		} 	
+	  		else {
+	  			shoppingResusltView.setResult(Result.COMPLETE);
+	  		}
+	  	}
+	  
+	  shoppingResusltView.setId(mediator.generatePurchaseId(cartId));
+	  mediator.addPurchase(shoppingResusltView); 
+	  return shoppingResusltView;
+	  
 	}
 	
 	@Override
@@ -236,7 +325,7 @@ public class MediatorPortImpl implements MediatorPortType {
 	@Override
 	public String ping(String name){
 		
-		System.out.println("ENTROU NO PING");
+		
 		String resultado = "";
 		try{
 			String c = null;
@@ -245,7 +334,7 @@ public class MediatorPortImpl implements MediatorPortType {
 				
 				if (c!= null){
 					SupplierClient client = new	SupplierClient(c);
-					resultado += "\n" + client.ping(name);
+					resultado += "Supplier 1 :" + client.ping(name) + "\n";
 				}
 						
 			}
@@ -253,6 +342,8 @@ public class MediatorPortImpl implements MediatorPortType {
 			exp.printStackTrace();}
 		catch(SupplierClientException exp){
 			exp.printStackTrace();}
+		
+		System.out.println(resultado);
 		
 	return resultado;
 }
@@ -322,6 +413,20 @@ public class MediatorPortImpl implements MediatorPortType {
 	}
     
 	// Exception helpers -----------------------------------------------------
+	
+	/** Helper method to throw new EmptyCart exception */
+	private void throwInvalidCreditCard(final String message) throws InvalidCreditCard_Exception {
+		InvalidCreditCard faultInfo = new InvalidCreditCard();
+		faultInfo.message = message;
+		throw new InvalidCreditCard_Exception(message, faultInfo);
+	}
+	
+	/** Helper method to throw new EmptyCart exception */
+	private void throwEmptyCart(final String message) throws EmptyCart_Exception {
+		EmptyCart faultInfo = new EmptyCart();
+		faultInfo.message = message;
+		throw new EmptyCart_Exception(message, faultInfo);
+	}
 	
 	/** Helper method to throw new NotEnoughItems exception */
 	private void throwNotEnoughItems(final String message) throws NotEnoughItems_Exception {

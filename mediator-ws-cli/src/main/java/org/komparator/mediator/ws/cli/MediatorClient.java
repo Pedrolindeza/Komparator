@@ -133,7 +133,6 @@ public class MediatorClient implements MediatorPortType {
 
     @Override
 	public String ping(String arg0) {
-    	System.out.println(" PING FUCKING ENVIADO ");
 		return port.ping(arg0);
 	}
 
