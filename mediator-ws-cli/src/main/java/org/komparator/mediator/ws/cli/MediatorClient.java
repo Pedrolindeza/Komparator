@@ -35,11 +35,11 @@ import pt.ulisboa.tecnico.sdis.ws.uddi.UDDINaming;
  */
 public class MediatorClient implements MediatorPortType {
 
-// TODO uncomment after generate-sources
+
    /** WS service */
     MediatorService service = null;
 
-// TODO uncomment after generate-sources
+
     /**WS port (port type is the interface, port is the implementation) */
     MediatorPortType port = null;
 
@@ -136,11 +136,7 @@ public class MediatorClient implements MediatorPortType {
 
     @Override
 	public String ping(String arg0) {
-<<<<<<< HEAD
-    	System.out.println(" Sou burro fdgsgfdsdbfdfdgsdfscxvfedsgefdbcvdvgrfdgsf");
-=======
     	System.out.println(" PING FUCKING ENVIADO ");
->>>>>>> refs/remotes/origin/master
 		return port.ping(arg0);
 	}
 
