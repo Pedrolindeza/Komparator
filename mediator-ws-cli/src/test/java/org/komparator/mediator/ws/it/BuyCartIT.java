@@ -10,26 +10,53 @@ public class BuyCartIT extends BaseIT {
 	
 	@Test(expected = InvalidCartId_Exception.class)
 	public void nullId() throws InvalidItemId_Exception, EmptyCart_Exception, InvalidCartId_Exception, InvalidCreditCard_Exception{
-		mediatorClient.buyCart(null, null);
+		mediatorClient.buyCart(null, "teste");
 	}
 	
 	@Test(expected = InvalidCartId_Exception.class)
 	public void emptyId() throws InvalidItemId_Exception, EmptyCart_Exception, InvalidCartId_Exception, InvalidCreditCard_Exception{
-		mediatorClient.buyCart("", "");
+		mediatorClient.buyCart("", "teste");
 	}
 	
 	@Test(expected = InvalidCartId_Exception.class)
 	public void onlySpacesId() throws InvalidItemId_Exception, EmptyCart_Exception, InvalidCartId_Exception, InvalidCreditCard_Exception{
-		mediatorClient.buyCart("                         ", "  ");
+		mediatorClient.buyCart("                         ", "teste");
 	}
 	
 	@Test(expected = InvalidCartId_Exception.class)
 	public void tabId() throws InvalidItemId_Exception, EmptyCart_Exception, InvalidCartId_Exception, InvalidCreditCard_Exception{
-		mediatorClient.buyCart("\t", "\n");
+		mediatorClient.buyCart("\t", "teste");
 	}
 	
 	@Test(expected = InvalidCartId_Exception.class)
 	public void newLineId() throws InvalidItemId_Exception, EmptyCart_Exception, InvalidCartId_Exception, InvalidCreditCard_Exception{
-		mediatorClient.buyCart("\n","\t");
+		mediatorClient.buyCart("\n","teste");
+	}
+	
+	
+	
+	@Test(expected = InvalidCreditCard_Exception.class)
+	public void nullCC() throws InvalidItemId_Exception, EmptyCart_Exception, InvalidCartId_Exception, InvalidCreditCard_Exception{
+		mediatorClient.buyCart("teste",null);
+	}
+	
+	@Test(expected = InvalidCreditCard_Exception.class)
+	public void emptyCC() throws InvalidItemId_Exception, EmptyCart_Exception, InvalidCartId_Exception, InvalidCreditCard_Exception{
+		mediatorClient.buyCart("teste","");
+	}
+	
+	@Test(expected = InvalidCreditCard_Exception.class)
+	public void onlySpacesCC() throws InvalidItemId_Exception, EmptyCart_Exception, InvalidCartId_Exception, InvalidCreditCard_Exception{
+		mediatorClient.buyCart("teste","                         ");
+	}
+	
+	@Test(expected = InvalidCreditCard_Exception.class)
+	public void tabCC() throws InvalidItemId_Exception, EmptyCart_Exception, InvalidCartId_Exception, InvalidCreditCard_Exception{
+		mediatorClient.buyCart("teste","\t");
+	}
+	
+	@Test(expected = InvalidCreditCard_Exception.class)
+	public void newLineCC() throws InvalidItemId_Exception, EmptyCart_Exception, InvalidCartId_Exception, InvalidCreditCard_Exception{
+		mediatorClient.buyCart("teste","\n");
 	}
 }
