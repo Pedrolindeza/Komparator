@@ -1,10 +1,15 @@
 package org.komparator.mediator.ws.it;
 
 
+import static org.junit.Assert.*;
+
+import java.util.List;
+
 import org.junit.Test;
 import org.komparator.mediator.ws.InvalidItemId_Exception;
 
 
+@SuppressWarnings("unused")
 public class GetItemsIT extends BaseIT{
 	
 	@Test(expected = InvalidItemId_Exception.class)
