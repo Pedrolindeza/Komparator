@@ -11,6 +11,7 @@ import javax.jws.WebService;
 
 import org.komparator.supplier.ws.BadProductId_Exception;
 import org.komparator.supplier.ws.BadProduct_Exception;
+import org.komparator.supplier.ws.BadQuantity_Exception;
 import org.komparator.supplier.ws.BadText_Exception;
 import org.komparator.supplier.ws.InsufficientQuantity_Exception;
 import org.komparator.supplier.ws.ProductView;
@@ -201,7 +202,12 @@ public class MediatorPortImpl implements MediatorPortType {
 				  try {
 					  
 					  SupplierClient client = new SupplierClient(endpointManager.getUddiNaming().lookup(cartItemView.getItem().getItemId().getSupplierId())); 
-					  PurchaseId = client.buyProduct(cartItemView.getItem().getItemId().getProductId(), cartItemView.getQuantity());
+					  try {
+						PurchaseId = client.buyProduct(cartItemView.getItem().getItemId().getProductId(), cartItemView.getQuantity());
+					} catch (BadQuantity_Exception e) {
+						
+						e.printStackTrace();
+					}
 					  shoppingResultView.getPurchasedItems().add(cartItemView);
 					  int cost = cartItemView.getQuantity() * cartItemView.getItem().getPrice();
 					  shoppingResultView.setTotalPrice(shoppingResultView.getTotalPrice() + cost);
