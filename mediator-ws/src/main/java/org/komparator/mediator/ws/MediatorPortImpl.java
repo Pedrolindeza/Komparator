@@ -58,7 +58,7 @@ public class MediatorPortImpl implements MediatorPortType {
 	@Override
 	public List<ItemView> getItems(String productID) throws InvalidItemId_Exception { 
 		
-		if(productID == null || productID == "" || productID.trim().length() == 0) {
+		if(productID == null || productID == "" || productID.contains("\n") || productID.contains("\t") || productID.trim().length() == 0) {
 			throwInvalidItemId("The productID you specified is invalid.");
 		}
 		
