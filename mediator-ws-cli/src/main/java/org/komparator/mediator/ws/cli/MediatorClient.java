@@ -7,6 +7,20 @@ import java.util.Map;
 
 import javax.xml.ws.BindingProvider;
 
+import org.komparator.mediator.ws.CartView;
+import org.komparator.mediator.ws.EmptyCart_Exception;
+import org.komparator.mediator.ws.InvalidCartId_Exception;
+import org.komparator.mediator.ws.InvalidCreditCard_Exception;
+import org.komparator.mediator.ws.InvalidItemId_Exception;
+import org.komparator.mediator.ws.InvalidQuantity_Exception;
+import org.komparator.mediator.ws.InvalidText_Exception;
+import org.komparator.mediator.ws.ItemIdView;
+import org.komparator.mediator.ws.ItemView;
+import org.komparator.mediator.ws.MediatorPortType;
+import org.komparator.mediator.ws.MediatorService;
+import org.komparator.mediator.ws.NotEnoughItems_Exception;
+import org.komparator.mediator.ws.ShoppingResultView;
+
 // TODO uncomment after generate-sources
 //import org.komparator.mediator.ws.*;
 
@@ -115,46 +129,47 @@ public class MediatorClient implements MediatorPortType {
     
     // TODO uncomment after generate-sources
     
-    // @Override
-	// public void clear() {
-		// port.clear();
-	// }
+    @Override
+	public void clear() {
+		port.clear();
+	}
 
-    // @Override
-	// public String ping(String arg0) {
-		// return port.ping(arg0);
-	// }
+    @Override
+	public String ping(String arg0) {
+    	System.out.println(" Sou burro fdgsgfdsdbfdfdgsdfscxvfedsgefdbcvdvgrfdgsf");
+		return port.ping(arg0);
+	}
 
-    // @Override
-	// public List<ItemView> searchItems(String descText) throws InvalidText_Exception {
-		// return port.searchItems(descText);
-	// }
+    @Override
+	public List<ItemView> searchItems(String descText) throws InvalidText_Exception {
+		return port.searchItems(descText);
+	}
 
-    // @Override
-	// public List<CartView> listCarts() {
-		// return port.listCarts();
-	// }
+    @Override
+	public List<CartView> listCarts() {
+		return port.listCarts();
+	}
 
-	// @Override
-	// public List<ItemView> getItems(String productId) throws InvalidItemId_Exception {
-		// return port.getItems(productId);
-	// }
+	@Override
+	public List<ItemView> getItems(String productId) throws InvalidItemId_Exception {
+		return port.getItems(productId);
+	}
 
-	// @Override
-	// public ShoppingResultView buyCart(String cartId, String creditCardNr)
-			// throws EmptyCart_Exception, InvalidCartId_Exception, InvalidCreditCard_Exception {
-		// return port.buyCart(cartId, creditCardNr);
-	// }
+	@Override
+	public ShoppingResultView buyCart(String cartId, String creditCardNr)
+			throws EmptyCart_Exception, InvalidCartId_Exception, InvalidCreditCard_Exception {
+		return port.buyCart(cartId, creditCardNr);
+	 }
 
-	// @Override
-	// public void addToCart(String cartId, ItemIdView itemId, int itemQty) throws InvalidCartId_Exception,
-			// InvalidItemId_Exception, InvalidQuantity_Exception, NotEnoughItems_Exception {
-		// port.addToCart(cartId, itemId, itemQty);
-	// }
+	@Override
+	public void addToCart(String cartId, ItemIdView itemId, int itemQty) throws InvalidCartId_Exception,
+			InvalidItemId_Exception, InvalidQuantity_Exception, NotEnoughItems_Exception {
+		port.addToCart(cartId, itemId, itemQty);
+	}
 
-	// @Override
-	// public List<ShoppingResultView> shopHistory() {
-		// return port.shopHistory();
-	// }
+	@Override
+	public List<ShoppingResultView> shopHistory() {
+		return port.shopHistory();
+	}
  
 }

@@ -30,7 +30,7 @@ public class SupplierClientApp {
 			wsName = args[1];
 			wsURL = args[2];
 			System.out.printf("Creating client for server at %s%n", wsURL);
-			client = new SupplierClient(uddiURL, wsName, wsURL);
+			client = new SupplierClient(uddiURL, wsName);
 			client.setVerbose(true);
 		}
 
