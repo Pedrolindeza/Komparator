@@ -45,6 +45,8 @@ public class BuyCartIT extends BaseIT {
 		mediatorClient.buyCart("teste","");
 	}
 	
+	
+	
 	@Test(expected = InvalidCreditCard_Exception.class)
 	public void onlySpacesCC() throws InvalidItemId_Exception, EmptyCart_Exception, InvalidCartId_Exception, InvalidCreditCard_Exception{
 		mediatorClient.buyCart("teste","                         ");
