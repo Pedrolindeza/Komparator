@@ -3,6 +3,7 @@ package org.komparator.supplier.ws;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.jws.HandlerChain;
 import javax.jws.WebService;
 
 import org.komparator.supplier.domain.Product;
@@ -11,6 +12,7 @@ import org.komparator.supplier.domain.QuantityException;
 import org.komparator.supplier.domain.Supplier;
 
 @SuppressWarnings("unused")
+
 @WebService(
 		endpointInterface = "org.komparator.supplier.ws.SupplierPortType", 
 		wsdlLocation = "supplier.1_0.wsdl", 
@@ -18,6 +20,9 @@ import org.komparator.supplier.domain.Supplier;
 		portName = "SupplierPort", 
 		targetNamespace = "http://ws.supplier.komparator.org/", 
 		serviceName = "SupplierService")
+
+@HandlerChain(file = "/supplier-ws_handler-chain.xml")
+
 
 public class SupplierPortImpl implements SupplierPortType {
 
