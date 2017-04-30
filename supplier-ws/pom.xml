@@ -19,11 +19,12 @@
 
         <mainclass>org.komparator.supplier.ws.SupplierApp</mainclass>
         
-        <ws.i>1</ws.i>
+        
 		<ws.host>localhost</ws.host>
     	<ws.port>808${ws.i}</ws.port>
     	<ws.url>http://${ws.host}:${ws.port}/supplier-ws/endpoint</ws.url>
     	<uddi.url>http://a54:uh3wLbpb@uddi.sd.rnl.tecnico.ulisboa.pt:9090/</uddi.url>
+    	<ws.i>1</ws.i>
     	<ws.name>A54_Supplier${ws.i}</ws.name>
 
         
