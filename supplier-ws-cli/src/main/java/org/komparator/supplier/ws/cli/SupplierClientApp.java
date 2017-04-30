@@ -23,9 +23,8 @@ public class SupplierClientApp {
 		if (args.length == 1) {
 			wsURL = args[0];
 			System.out.printf("Creating client for server at %s%n", wsURL);
-			System.out.println("1 arg");
 			client = new SupplierClient(wsURL);
-		} else if (args.length >= 2) {
+		} else if (args.length >= 3) {
 			uddiURL = args[0];
 			wsName = args[1];
 			wsURL = args[2];
