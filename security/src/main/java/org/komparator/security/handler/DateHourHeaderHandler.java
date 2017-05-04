@@ -1,7 +1,9 @@
-package example.ws.handler;
+package org.komparator.security.handler;
 
 import java.util.Iterator;
 import java.util.Set;
+
+import java.time.ZonedDateTime;
 
 import javax.xml.namespace.QName;
 import javax.xml.soap.Name;
@@ -15,7 +17,8 @@ import javax.xml.ws.handler.MessageContext;
 import javax.xml.ws.handler.MessageContext.Scope;
 import javax.xml.ws.handler.soap.SOAPHandler;
 import javax.xml.ws.handler.soap.SOAPMessageContext;
-
+import java.text.SimpleDateFormat;
+import java.util.Date;
 /**
  * This SOAPHandler shows how to set/get values from headers in inbound/outbound
  * SOAP messages.
@@ -25,9 +28,10 @@ import javax.xml.ws.handler.soap.SOAPMessageContext;
  * The value that is read from the header is placed in a SOAP message context
  * property that can be accessed by other handlers or by the application.
  */
-public class HeaderHandler implements SOAPHandler<SOAPMessageContext> {
+public class DateHourHeaderHandler implements SOAPHandler<SOAPMessageContext> {
 
 	public static final String CONTEXT_PROPERTY = "my.property";
+	private SimpleDateFormat dateFormatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS");
 
 	//
 	// Handler interface implementation
@@ -48,13 +52,17 @@ public class HeaderHandler implements SOAPHandler<SOAPMessageContext> {
 	 */
 	@Override
 	public boolean handleMessage(SOAPMessageContext smc) {
-		System.out.println("AddHeaderHandler: Handling message.");
+		System.out.println();
+		System.out.println("\tDate and Hour Header");
 
 		Boolean outboundElement = (Boolean) smc.get(MessageContext.MESSAGE_OUTBOUND_PROPERTY);
 
 		try {
 			if (outboundElement.booleanValue()) {
-				System.out.println("Writing header in outbound SOAP message...");
+				System.out.println("\t---------------");
+				System.out.println("\t   OUTBOUND    ");
+				System.out.println("\t---------------");
+				System.out.println();
 
 				// get SOAP envelope
 				SOAPMessage msg = smc.getMessage();
@@ -67,16 +75,19 @@ public class HeaderHandler implements SOAPHandler<SOAPMessageContext> {
 					sh = se.addHeader();
 
 				// add header element (name, namespace prefix, namespace)
-				Name name = se.createName("myHeader", "d", "http://demo");
+				Name name = se.createName("DateHour", "D", "http://demo");
 				SOAPHeaderElement element = sh.addHeaderElement(name);
 
 				// add header element value
-				int value = 22;
-				String valueString = Integer.toString(value);
-				element.addTextNode(valueString);
+				String dateString = dateFormatter.format(new Date());
+				element.addTextNode(dateString);
 
 			} else {
-				System.out.println("Reading header in inbound SOAP message...");
+
+				System.out.println("\t---------------");
+				System.out.println("\t    INBOUND    ");
+				System.out.println("\t---------------");
+				System.out.println();
 
 				// get SOAP envelope header
 				SOAPMessage msg = smc.getMessage();
@@ -91,8 +102,9 @@ public class HeaderHandler implements SOAPHandler<SOAPMessageContext> {
 				}
 
 				// get first header element
-				Name name = se.createName("myHeader", "d", "http://demo");
+				Name name = se.createName("DateHour", "dt", "http://demo");
 				Iterator it = sh.getChildElements(name);
+				
 				// check header element
 				if (!it.hasNext()) {
 					System.out.println("Header element not found.");
@@ -101,14 +113,21 @@ public class HeaderHandler implements SOAPHandler<SOAPMessageContext> {
 				SOAPElement element = (SOAPElement) it.next();
 
 				// get header element value
-				String valueString = element.getValue();
-				int value = Integer.parseInt(valueString);
+				String dateString = element.getValue();
 
+				Date sent = dateFormatter.parse(dateString);
+				Date received = new Date();
+				
+				if ( ( received.getTime() - sent.getTime() ) > 3000 ){				//3000 = 3 segundos
+					return false;
+				}
+				
+				
 				// print received header
-				System.out.println("Header value is " + value);
+				System.out.println("Header : " + dateString);
 
 				// put header in a property context
-				smc.put(CONTEXT_PROPERTY, value);
+				smc.put(CONTEXT_PROPERTY, dateString);
 				// set property scope to application client/server class can
 				// access it
 				smc.setScope(CONTEXT_PROPERTY, Scope.APPLICATION);

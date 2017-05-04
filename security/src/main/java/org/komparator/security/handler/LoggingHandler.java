@@ -69,15 +69,27 @@ public class LoggingHandler implements SOAPHandler<SOAPMessageContext> {
 		Boolean outbound = (Boolean) smc.get(MessageContext.MESSAGE_OUTBOUND_PROPERTY);
 
 		// print current timestamp
-		System.out.print("[");
+		System.out.println();
+		System.out.println("\tLogging Handler");
+		System.out.print("\t[");
 		System.out.print(dateFormatter.format(new Date()));
 		System.out.print("] ");
 		
 		System.out.print("intercepted ");
-		if (outbound)
-			System.out.print("OUTbound");
-		else
-			System.out.print(" INbound");
+		if (outbound){
+			System.out.println();
+			System.out.println("\t---------------");
+			System.out.println("\t   OUTBOUND    ");
+			System.out.println("\t---------------");
+			System.out.println();
+		}
+		else{
+			System.out.println();
+			System.out.println("\t---------------");
+			System.out.println("\t    INBOUND    ");
+			System.out.println("\t---------------");
+			System.out.println();
+			}
 		System.out.println(" SOAP message:");
 
 		SOAPMessage message = smc.getMessage();

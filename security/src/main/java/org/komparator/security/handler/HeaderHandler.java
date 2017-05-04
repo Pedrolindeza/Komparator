@@ -1,9 +1,7 @@
-package example.ws.handler;
+package org.komparator.security.handler;
 
 import java.util.Iterator;
 import java.util.Set;
-
-import java.time.ZonedDateTime;
 
 import javax.xml.namespace.QName;
 import javax.xml.soap.Name;
@@ -27,7 +25,7 @@ import javax.xml.ws.handler.soap.SOAPMessageContext;
  * The value that is read from the header is placed in a SOAP message context
  * property that can be accessed by other handlers or by the application.
  */
-public class DateHourHeaderHandler implements SOAPHandler<SOAPMessageContext> {
+public class HeaderHandler implements SOAPHandler<SOAPMessageContext> {
 
 	public static final String CONTEXT_PROPERTY = "my.property";
 
@@ -69,14 +67,13 @@ public class DateHourHeaderHandler implements SOAPHandler<SOAPMessageContext> {
 					sh = se.addHeader();
 
 				// add header element (name, namespace prefix, namespace)
-				Name name = se.createName("DateHour", "dt", "http://demo");
+				Name name = se.createName("myHeader", "d", "http://demo");
 				SOAPHeaderElement element = sh.addHeaderElement(name);
 
 				// add header element value
-				ZonedDateTime date = ZonedDateTime.now();
-				
-				String dateString = date.toString();
-				element.addTextNode(dateString);
+				int value = 22;
+				String valueString = Integer.toString(value);
+				element.addTextNode(valueString);
 
 			} else {
 				System.out.println("Reading header in inbound SOAP message...");
@@ -94,9 +91,8 @@ public class DateHourHeaderHandler implements SOAPHandler<SOAPMessageContext> {
 				}
 
 				// get first header element
-				Name name = se.createName("DateHour", "dt", "http://demo");
+				Name name = se.createName("myHeader", "d", "http://demo");
 				Iterator it = sh.getChildElements(name);
-				
 				// check header element
 				if (!it.hasNext()) {
 					System.out.println("Header element not found.");
@@ -105,13 +101,14 @@ public class DateHourHeaderHandler implements SOAPHandler<SOAPMessageContext> {
 				SOAPElement element = (SOAPElement) it.next();
 
 				// get header element value
-				String dateString = element.getValue();
+				String valueString = element.getValue();
+				int value = Integer.parseInt(valueString);
 
 				// print received header
-				System.out.println("Sent time: " + dateString);
+				System.out.println("Header value is " + value);
 
 				// put header in a property context
-				smc.put(CONTEXT_PROPERTY, dateString);
+				smc.put(CONTEXT_PROPERTY, value);
 				// set property scope to application client/server class can
 				// access it
 				smc.setScope(CONTEXT_PROPERTY, Scope.APPLICATION);
