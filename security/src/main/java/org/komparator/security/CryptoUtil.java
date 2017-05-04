@@ -9,7 +9,7 @@ import java.util.*;
 
 public class CryptoUtil {
 
-	public byte[] asymCipher(byte[] plainBytes, Key publicKey){
+	public static byte[] asymCipher(byte[] plainBytes, Key publicKey){
 		
     	Cipher cipher = null;
     	byte[] cipherBytes = null;
@@ -39,7 +39,7 @@ public class CryptoUtil {
     	return cipherBytes;
     }
 	
-	public byte[] asymDecipher(byte[] cipherBytes, Key privateKey){
+	public static byte[] asymDecipher(byte[] cipherBytes, Key privateKey){
 		
 		Cipher cipher = null;
     	byte[] plainBytes = null;
