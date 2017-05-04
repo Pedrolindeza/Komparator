@@ -50,6 +50,7 @@ public class DateHourHeaderHandler implements SOAPHandler<SOAPMessageContext> {
 	 * The handleMessage method is invoked for normal processing of inbound and
 	 * outbound messages.
 	 */
+	
 	@Override
 	public boolean handleMessage(SOAPMessageContext smc) {
 		System.out.println();

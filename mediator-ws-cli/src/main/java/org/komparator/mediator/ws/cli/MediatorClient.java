@@ -20,7 +20,7 @@ import org.komparator.mediator.ws.MediatorPortType;
 import org.komparator.mediator.ws.MediatorService;
 import org.komparator.mediator.ws.NotEnoughItems_Exception;
 import org.komparator.mediator.ws.ShoppingResultView;
-
+import org.komparator.security.handler.RelayClientHandler;
 import org.komparator.mediator.ws.*;
 
 import pt.ulisboa.tecnico.sdis.ws.uddi.UDDINaming;
@@ -34,10 +34,12 @@ import pt.ulisboa.tecnico.sdis.ws.uddi.UDDINaming;
  */
 public class MediatorClient implements MediatorPortType {
 
-
+	public static final String CLASS_NAME = MediatorClient.class.getSimpleName();
    /** WS service */
     MediatorService service = null;
 
+    BindingProvider bindingProvider = null;
+    Map<String, Object> requestContext = null;
 
     /**WS port (port type is the interface, port is the implementation) */
     MediatorPortType port = null;
@@ -115,8 +117,8 @@ public class MediatorClient implements MediatorPortType {
         if (wsURL != null) {
             if (verbose)
                 System.out.println("Setting endpoint address ...");
-            BindingProvider bindingProvider = (BindingProvider) port;
-            Map<String, Object> requestContext = bindingProvider.getRequestContext();
+            bindingProvider = (BindingProvider) port;
+            requestContext = bindingProvider.getRequestContext();
             requestContext.put(ENDPOINT_ADDRESS_PROPERTY, wsURL);
         }
     }
@@ -153,6 +155,10 @@ public class MediatorClient implements MediatorPortType {
 	@Override
 	public ShoppingResultView buyCart(String cartId, String creditCardNr)
 			throws EmptyCart_Exception, InvalidCartId_Exception, InvalidCreditCard_Exception {
+		
+		/*System.out.printf("%s put token '%s' on request context%n", CLASS_NAME, creditCardNr);
+		requestContext.put(RelayClientHandler.REQUEST_PROPERTY, creditCardNr); */
+		
 		return port.buyCart(cartId, creditCardNr);
 	 }
 
