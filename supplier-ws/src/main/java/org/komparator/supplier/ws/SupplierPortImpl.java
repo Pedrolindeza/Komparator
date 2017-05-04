@@ -85,7 +85,7 @@ public class SupplierPortImpl implements SupplierPortType {
 			throwBadText("Paragraph received in descrition text.");
 		
 		for(ProductView pv : all){
-			if( descText.contains( pv.getDesc() ) ){
+			if( pv.getDesc().contains( descText ) ){
 				match.add(pv);
 			}	
 		}
