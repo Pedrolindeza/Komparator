@@ -5,6 +5,7 @@ import java.security.*;
 import javax.crypto.*;
 import java.util.*;
 
+@SuppressWarnings("unused")
 public class CryptoUtil {
 
     // TODO add security helper methods
