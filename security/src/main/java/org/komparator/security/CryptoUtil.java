@@ -9,58 +9,30 @@ import java.util.*;
 
 public class CryptoUtil {
 
-	public static byte[] asymCipher(byte[] plainBytes, Key publicKey){
+	public static byte[] asymCipher(byte[] plainBytes, Key publicKey) throws NoSuchAlgorithmException, NoSuchPaddingException, InvalidKeyException, IllegalBlockSizeException, BadPaddingException{
 		
     	Cipher cipher = null;
     	byte[] cipherBytes = null;
 		
-    	try {
-			cipher = Cipher.getInstance("RSA/ECB/PKCS1Padding");
-		} catch (NoSuchAlgorithmException | NoSuchPaddingException e) {
-			e.printStackTrace();
-		}
+		cipher = Cipher.getInstance("RSA/ECB/PKCS1Padding");
     	
-    	try {
-			cipher.init(Cipher.ENCRYPT_MODE, publicKey);
-		}
-    	catch (InvalidKeyException e) {
-			e.printStackTrace();
-		}
-    	
-    	try {
-			cipherBytes = cipher.doFinal(plainBytes);	
-		}
-    	catch (IllegalBlockSizeException e) {
-			e.printStackTrace();
-		} catch (BadPaddingException e) {
-			e.printStackTrace();
-		}
-    	
+    	cipher.init(Cipher.ENCRYPT_MODE, publicKey);
+		
+    	cipherBytes = cipher.doFinal(plainBytes);	
+		
     	return cipherBytes;
     }
 	
-	public static byte[] asymDecipher(byte[] cipherBytes, Key privateKey){
+	public static byte[] asymDecipher(byte[] cipherBytes, Key privateKey) throws NoSuchAlgorithmException, NoSuchPaddingException, InvalidKeyException, IllegalBlockSizeException, BadPaddingException{
 		
 		Cipher cipher = null;
     	byte[] plainBytes = null;
     	
-    	try {
-			cipher = Cipher.getInstance("RSA/ECB/PKCS1Padding");
-		} catch (NoSuchAlgorithmException | NoSuchPaddingException e) {
-			e.printStackTrace();
-		}
-    	
-		try {
-			cipher.init(Cipher.DECRYPT_MODE, privateKey);
-		} catch (InvalidKeyException e) {
-			e.printStackTrace();
-		}
+    	cipher = Cipher.getInstance("RSA/ECB/PKCS1Padding");
 		
-		try {
-			plainBytes = cipher.doFinal(cipherBytes);
-		} catch (IllegalBlockSizeException | BadPaddingException e) {
-			e.printStackTrace();
-		}
+    	cipher.init(Cipher.DECRYPT_MODE, privateKey);
+		
+		plainBytes = cipher.doFinal(cipherBytes);
 		
 		return plainBytes;
 	}
