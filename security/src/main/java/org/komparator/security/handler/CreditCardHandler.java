@@ -165,7 +165,7 @@ public class CreditCardHandler implements SOAPHandler<SOAPMessageContext> {
 						
 						CAClient ca = new CAClient("http://sec.sd.rnl.tecnico.ulisboa.pt:8081/ca");
 						
-						String stringCert = ca.getCertificate("A54_Mediator.cer");
+						String stringCert = ca.getCertificate(CERTIFICATE);
 						
 						publicKey = CertUtil.getX509CertificateFromPEMString(stringCert).getPublicKey();
 				    	

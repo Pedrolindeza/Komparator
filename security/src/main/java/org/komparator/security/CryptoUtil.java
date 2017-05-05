@@ -58,7 +58,7 @@ public class CryptoUtil {
 		return plainBytes;
 	}
 	
-	public byte[] makeDigitalSignature(PrivateKey privateKey, byte[] bytesToSign){
+	public static byte[] makeDigitalSignature(PrivateKey privateKey, byte[] bytesToSign){
 		
 		return CertUtil.makeDigitalSignature("SHA256withRSA", privateKey, bytesToSign);
 		

@@ -41,14 +41,12 @@ public class SignatureHandler implements SOAPHandler<SOAPMessageContext> {
 
 	public static final String CONTEXT_PROPERTY = "my.property";
 	
-	
-	
-	final static String CERTIFICATE = "A54_Mediator.cer";
+	static String CERTIFICATE = null;
 
-	final static String KEYSTORE = "A54_Mediator.jks";
+	static String KEYSTORE = null;
 	final static String KEYSTORE_PASSWORD = "uh3wLbpb";
 
-	final static String KEY_ALIAS = "A54_Mediator";
+	static String KEY_ALIAS = null;
 	final static String KEY_PASSWORD = "uh3wLbpb";
 
 	static PublicKey publicKey;
@@ -74,11 +72,28 @@ public class SignatureHandler implements SOAPHandler<SOAPMessageContext> {
 	@Override
 	public boolean handleMessage(SOAPMessageContext smc) {
 		
-		System.out.println();
-		System.out.println("\tCredit Card Handler");
-
 		Boolean outboundElement = (Boolean) smc.get(MessageContext.MESSAGE_OUTBOUND_PROPERTY);
 
+		String propertyValue = (String) smc.get(CONTEXT_PROPERTY);
+		
+		if (propertyValue.equals("A54_Supplier1")) {
+			CERTIFICATE = "A54_Supplier1.cer";
+			KEYSTORE = "A54_Supplier1.jks";
+			KEY_ALIAS = "A54_Supplier1";
+
+		} else if (propertyValue.equals("A54_Supplier2")) {
+			CERTIFICATE = "A54_Supplier2.cer";
+			KEYSTORE = "A54_Supplier2.jks";
+			KEY_ALIAS = "A54_Supplier2";
+
+		} else if (propertyValue.equals("A54_Supplier3")) {
+			CERTIFICATE = "A54_Supplier3.cer";
+			KEYSTORE = "A54_Supplier3.jks";
+			KEY_ALIAS = "A54_Supplier3";
+		}
+		
+		System.out.println();
+		System.out.println("\tSupplier Communication");
 		try {
 			if (outboundElement.booleanValue()) {
 				
@@ -101,92 +116,31 @@ public class SignatureHandler implements SOAPHandler<SOAPMessageContext> {
 				QName svcn = (QName) smc.get(MessageContext.WSDL_SERVICE);
 				QName opn = (QName) smc.get(MessageContext.WSDL_OPERATION);
 				
-				if (!opn.getLocalPart().equals("buyCart")) {
-					return true; }
-
-				NodeList children = sb.getFirstChild().getChildNodes();
+				ByteArrayOutputStream array = new ByteArrayOutputStream();
+				msg.writeTo(array);
+				String aux = array.toString();
+				byte[] plainBytes = DatatypeConverter.parseBase64Binary(aux);
 				
-				for (int i = 0; i < children.getLength(); i++) {
-					Node argument = (Node) children.item(i);
-					if (argument.getNodeName().equals("creditCardNr")) {
-						
-						CAClient ca = new CAClient("http://sec.sd.rnl.tecnico.ulisboa.pt:8081/ca");
-						
-						String stringCert = ca.getCertificate("A54_Mediator.cer");
-						
-						publicKey = CertUtil.getX509CertificateFromPEMString(stringCert).getPublicKey();
-				    	
-				    	privateKey = CertUtil.getPrivateKeyFromKeyStoreResource(KEYSTORE,
-								KEYSTORE_PASSWORD.toCharArray(), KEY_ALIAS, KEY_PASSWORD.toCharArray());
-						
-						String secretArgument = argument.getTextContent();
-						
-						byte[] plainArg = DatatypeConverter.parseBase64Binary(secretArgument); 
-						
-						byte[] cipheredArg = CryptoUtil.asymCipher(plainArg, publicKey);
-						
-						String encodedSecretArgument = DatatypeConverter.printBase64Binary(cipheredArg);
-						
-						argument.setTextContent(encodedSecretArgument);
-						
-						msg.saveChanges();
+		    	CAClient ca = new CAClient("http://sec.sd.rnl.tecnico.ulisboa.pt:8081/ca");
 				
-					}
-				}
-
-			} else {
+				String stringCert = ca.getCertificate(CERTIFICATE);
+				
+				publicKey = CertUtil.getX509CertificateFromPEMString(stringCert).getPublicKey();
+		    	
+		    	privateKey = CertUtil.getPrivateKeyFromKeyStoreResource(KEYSTORE,
+						KEYSTORE_PASSWORD.toCharArray(), KEY_ALIAS, KEY_PASSWORD.toCharArray());
+		    	
+		    	byte[] signature = CryptoUtil.makeDigitalSignature(privateKey, plainBytes );
+		    	
+			}else {
 				System.out.println("\t---------------");
 				System.out.println("\t   INBOUND     ");
 				System.out.println("\t---------------");
 				System.out.println();
 
-				// get SOAP envelope
-				SOAPMessage msg = smc.getMessage();
-				SOAPPart sp = msg.getSOAPPart();
-				SOAPEnvelope se = sp.getEnvelope();
-				SOAPBody sb = se.getBody();
-
-				// add header
-				SOAPHeader sh = se.getHeader();
-				if (sh == null)
-					sh = se.addHeader();
 				
-				QName svcn = (QName) smc.get(MessageContext.WSDL_SERVICE);
-				QName opn = (QName) smc.get(MessageContext.WSDL_OPERATION);
-				
-				if (!opn.getLocalPart().equals("buyCart")) {
-					return true; }
-
-				NodeList children = sb.getFirstChild().getChildNodes();
-				
-				for (int i = 0; i < children.getLength(); i++) {
-					Node argument = (Node) children.item(i);
-					if (argument.getNodeName().equals("creditCardNr")) {
-						
-						CAClient ca = new CAClient("http://sec.sd.rnl.tecnico.ulisboa.pt:8081/ca");
-						
-						String stringCert = ca.getCertificate("A54_Mediator.cer");
-						
-						publicKey = CertUtil.getX509CertificateFromPEMString(stringCert).getPublicKey();
-				    	
-				    	privateKey = CertUtil.getPrivateKeyFromKeyStoreResource(KEYSTORE,
-								KEYSTORE_PASSWORD.toCharArray(), KEY_ALIAS, KEY_PASSWORD.toCharArray());
-						
-						String secretArgument = argument.getTextContent();
-						
-						byte[] cipheredArg = DatatypeConverter.parseBase64Binary(secretArgument); 
-						
-						byte[] plainArg = CryptoUtil.asymDecipher(cipheredArg, publicKey);
-						
-						String decodedSecretArgument = DatatypeConverter.printBase64Binary(plainArg);
-						
-						argument.setTextContent(decodedSecretArgument);
-						
-						msg.saveChanges();
-				
-					}
 				}
-			}
+			
 		} catch (Exception e) {
 			System.out.print("Caught exception in handleMessage: ");
 			System.out.println(e);
