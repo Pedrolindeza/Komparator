@@ -26,6 +26,8 @@ import org.komparator.security.CertUtil;
 import org.komparator.security.CryptoUtil;
 import org.w3c.dom.NodeList;
 
+import pt.ulisboa.tecnico.sdis.ws.cli.CAClient;
+
 /**
  * This SOAPHandler shows how to set/get values from headers in inbound/outbound
  * SOAP messages.
@@ -108,7 +110,11 @@ public class CreditCardHandler implements SOAPHandler<SOAPMessageContext> {
 					Node argument = (Node) children.item(i);
 					if (argument.getNodeName().equals("creditCardNr")) {
 						
-						publicKey = CertUtil.getX509CertificateFromResource(CERTIFICATE).getPublicKey();
+						CAClient ca = new CAClient("http://sec.sd.rnl.tecnico.ulisboa.pt:8081/ca");
+						
+						String stringCert = ca.getCertificate("A54_Mediator.cer");
+						
+						publicKey = CertUtil.getX509CertificateFromPEMString(stringCert).getPublicKey();
 				    	
 				    	privateKey = CertUtil.getPrivateKeyFromKeyStoreResource(KEYSTORE,
 								KEYSTORE_PASSWORD.toCharArray(), KEY_ALIAS, KEY_PASSWORD.toCharArray());
@@ -157,7 +163,11 @@ public class CreditCardHandler implements SOAPHandler<SOAPMessageContext> {
 					Node argument = (Node) children.item(i);
 					if (argument.getNodeName().equals("creditCardNr")) {
 						
-						publicKey = CertUtil.getX509CertificateFromResource(CERTIFICATE).getPublicKey();
+						CAClient ca = new CAClient("http://sec.sd.rnl.tecnico.ulisboa.pt:8081/ca");
+						
+						String stringCert = ca.getCertificate("A54_Mediator.cer");
+						
+						publicKey = CertUtil.getX509CertificateFromPEMString(stringCert).getPublicKey();
 				    	
 				    	privateKey = CertUtil.getPrivateKeyFromKeyStoreResource(KEYSTORE,
 								KEYSTORE_PASSWORD.toCharArray(), KEY_ALIAS, KEY_PASSWORD.toCharArray());

@@ -66,7 +66,7 @@ public class CryptoUtilTest {
 
     // tests
     @Test
-    public void sucess() {
+    public void sucess() throws InvalidKeyException, NoSuchAlgorithmException, NoSuchPaddingException, IllegalBlockSizeException, BadPaddingException {
         
     	byte[] ciphered = CryptoUtil.asymCipher(plainBytes, publicKey);
     	
