@@ -35,20 +35,5 @@ public class Singleton {
 	public void setUrl(String url) {
 		this.url = url;
 	}
-	
-	public String getUDDI() throws UDDINamingException {
-		
-		
-		UDDINaming uddiNaming = new UDDINaming("http://a54:uh3wLbpb@uddi.sd.rnl.tecnico.ulisboa.pt:9090");
-	
-		String uddiName = null;
-		
-		for (UDDIRecord uddiRecord : uddiNaming.listRecords("A54_Mediator" + "%")) {
-			if (uddiRecord.getUrl().equals(this.url)) {
-				uddiName = uddiRecord.getOrgName();
-			}
-		}
-	
-		return uddiName;
-	}
+
 }

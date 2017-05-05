@@ -283,7 +283,7 @@ public class MediatorPortImpl implements MediatorPortType {
 	  	shoppingResultView.setId("PurchaseID: " + cartId + creditCardNr);
 	  	shoppingResultsList.add(shoppingResultView);
 	  	return shoppingResultView;
-	  
+
 }
 	
 
