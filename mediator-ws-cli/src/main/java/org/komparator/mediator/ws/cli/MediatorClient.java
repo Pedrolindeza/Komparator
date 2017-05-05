@@ -5,6 +5,7 @@ import static javax.xml.ws.BindingProvider.ENDPOINT_ADDRESS_PROPERTY;
 import java.util.List;
 import java.util.Map;
 
+import javax.xml.bind.DatatypeConverter;
 import javax.xml.ws.BindingProvider;
 
 import org.komparator.mediator.ws.CartView;
@@ -20,6 +21,8 @@ import org.komparator.mediator.ws.MediatorPortType;
 import org.komparator.mediator.ws.MediatorService;
 import org.komparator.mediator.ws.NotEnoughItems_Exception;
 import org.komparator.mediator.ws.ShoppingResultView;
+import org.komparator.security.CryptoUtil;
+import org.komparator.security.handler.CreditCardHandler;
 import org.komparator.security.handler.RelayClientHandler;
 import org.komparator.mediator.ws.*;
 
@@ -155,9 +158,6 @@ public class MediatorClient implements MediatorPortType {
 	@Override
 	public ShoppingResultView buyCart(String cartId, String creditCardNr)
 			throws EmptyCart_Exception, InvalidCartId_Exception, InvalidCreditCard_Exception {
-		
-		/*System.out.printf("%s put token '%s' on request context%n", CLASS_NAME, creditCardNr);
-		requestContext.put(RelayClientHandler.REQUEST_PROPERTY, creditCardNr); */
 		
 		return port.buyCart(cartId, creditCardNr);
 	 }

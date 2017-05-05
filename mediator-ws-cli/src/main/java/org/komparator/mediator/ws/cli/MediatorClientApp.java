@@ -39,6 +39,6 @@ public class MediatorClientApp {
         
         String result = client.ping("client");
         System.out.println(result);
-
+        
     }
 }

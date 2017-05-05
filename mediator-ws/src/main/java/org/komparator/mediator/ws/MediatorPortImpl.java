@@ -169,7 +169,6 @@ public class MediatorPortImpl implements MediatorPortType {
 	@Override
 	public ShoppingResultView buyCart(String cartId, String creditCardNr) throws EmptyCart_Exception, InvalidCartId_Exception, InvalidCreditCard_Exception  {
 		
-		
 		if (cartId == null || cartId == "\n" || cartId == "\t" || cartId == "" || cartId.trim().length() == 0 ) {
 			throwInvalidCartId("The cart ID you specified is invalid.");
 		}
