@@ -88,25 +88,6 @@ public class SignatureHandler implements SOAPHandler<SOAPMessageContext> {
 		System.out.println();
 		System.out.println("\tSupplier Communication");
 		
-		Singleton single = Singleton.getInstance();
-		String wsName = single.getName();
-		
-		if (wsName.equals("A54_Supplier1")) {
-			CERTIFICATE = "A54_Supplier1.cer";
-			KEYSTORE = "A54_Supplier1.jks";
-			KEY_ALIAS = "A54_Supplier1";
-
-		} else if (wsName.equals("A54_Supplier2")) {
-			CERTIFICATE = "A54_Supplier2.cer";
-			KEYSTORE = "A54_Supplier2.jks";
-			KEY_ALIAS = "A54_Supplier2";
-
-		} else if (wsName.equals("A54_Supplier3")) {
-			CERTIFICATE = "A54_Supplier3.cer";
-			KEYSTORE = "A54_Supplier3.jks";
-			KEY_ALIAS = "A54_Supplier3";
-		}
-		
 		try {
 			if (outboundElement.booleanValue()) {
 				
@@ -114,6 +95,25 @@ public class SignatureHandler implements SOAPHandler<SOAPMessageContext> {
 				System.out.println("\t   OUTBOUND    ");
 				System.out.println("\t---------------");
 				System.out.println();
+				
+				Singleton single = Singleton.getInstance();
+				String wsName = single.getName();
+				
+				if (wsName.equals("A54_Supplier1")) {
+					CERTIFICATE = "A54_Supplier1.cer";
+					KEYSTORE = "A54_Supplier1.jks";
+					KEY_ALIAS = "a54_supplier1";
+
+				} else if (wsName.equals("A54_Supplier2")) {
+					CERTIFICATE = "A54_Supplier2.cer";
+					KEYSTORE = "A54_Supplier2.jks";
+					KEY_ALIAS = "a54_supplier2";
+
+				} else if (wsName.equals("A54_Supplier3")) {
+					CERTIFICATE = "A54_Supplier3.cer";
+					KEYSTORE = "A54_Supplier3.jks";
+					KEY_ALIAS = "a54_supplier3";
+				}
 			
 				privateKey = CertUtil.getPrivateKeyFromKeyStoreResource(KEYSTORE,
 							KEYSTORE_PASSWORD.toCharArray(), KEY_ALIAS, KEY_PASSWORD.toCharArray());
@@ -136,13 +136,6 @@ public class SignatureHandler implements SOAPHandler<SOAPMessageContext> {
 				String myName = wsName;
 				element2.addTextNode(myName);
 				
-				// add header element (name, namespace prefix, namespace)
-				Name timestamp = se.createName("timestamp", "t", "http://demo");
-				SOAPHeaderElement element = sh.addHeaderElement(timestamp);
-				// add header element value
-				String dateString = dateFormatter.format(new Date());
-				element.addTextNode(dateString);
-				
 				String message = soapMessageToString(msg);
 				byte[] plainMsg = DatatypeConverter.parseBase64Binary(message);
 				byte[] digitalSignature = CryptoUtil.makeDigitalSignature(privateKey, plainMsg);
@@ -154,7 +147,11 @@ public class SignatureHandler implements SOAPHandler<SOAPMessageContext> {
 				String signature = DatatypeConverter.printBase64Binary(digitalSignature);
 				element3.addTextNode(signature);
 				
-			}else {
+				msg.saveChanges();
+				
+				return true;
+				
+			} else {
 				System.out.println("\t---------------");
 				System.out.println("\t   INBOUND     ");
 				System.out.println("\t---------------");
@@ -177,7 +174,7 @@ public class SignatureHandler implements SOAPHandler<SOAPMessageContext> {
 				Iterator it = sh.getChildElements(name);
 				// check header element
 				if (!it.hasNext()) {
-					System.out.println("Header element not found.");
+					System.out.println("Header NAME element not found.");
 					return true;
 				}
 				SOAPElement element = (SOAPElement) it.next();
@@ -191,7 +188,7 @@ public class SignatureHandler implements SOAPHandler<SOAPMessageContext> {
 				Iterator it2 = sh.getChildElements(diggest);
 				// check header element
 				if (!it2.hasNext()) {
-					System.out.println("Header element not found.");
+					System.out.println("Header Diggest not found.");
 					return true;
 				}
 				SOAPElement element2 = (SOAPElement) it2.next();
@@ -205,8 +202,8 @@ public class SignatureHandler implements SOAPHandler<SOAPMessageContext> {
 				if ( !CryptoUtil.verifyDigitalSignature(publicKey, bytesToVerify, signature ))
 					throw new RuntimeException();
 				
-				}
-			
+				msg.saveChanges();
+			}			
 		} catch (Exception e) {
 			System.out.print("Caught exception in handleMessage: ");
 			System.out.println(e);

@@ -48,7 +48,7 @@ public class CreditCardHandler implements SOAPHandler<SOAPMessageContext> {
 	final static String KEYSTORE = "A54_Mediator.jks";
 	final static String KEYSTORE_PASSWORD = "uh3wLbpb";
 
-	final static String KEY_ALIAS = "A54_Mediator";
+	final static String KEY_ALIAS = "a54_mediator";
 	final static String KEY_PASSWORD = "uh3wLbpb";
 
 	static PublicKey publicKey;
