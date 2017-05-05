@@ -5,6 +5,7 @@ import java.util.Set;
 
 import java.time.ZonedDateTime;
 
+import javax.management.RuntimeErrorException;
 import javax.xml.namespace.QName;
 import javax.xml.soap.Name;
 import javax.xml.soap.SOAPElement;
@@ -82,6 +83,7 @@ public class DateHourHeaderHandler implements SOAPHandler<SOAPMessageContext> {
 				// add header element value
 				String dateString = dateFormatter.format(new Date());
 				element.addTextNode(dateString);
+				//Thread.sleep(3000);
 
 			} else {
 
@@ -117,13 +119,21 @@ public class DateHourHeaderHandler implements SOAPHandler<SOAPMessageContext> {
 				String dateString = element.getValue();
 
 				Date sent = dateFormatter.parse(dateString);
-				Date received = new Date();
+				Date received = new Date() ;
 				
-				if ( ( received.getTime() - sent.getTime() ) > 3000 ){				//3000 = 3 segundos
-					return false;
+				
+				
+				if ( (received.getTime() - sent.getTime()) > 3000 ){	//3000 = 3 segundos
+					System.out.println("sdfgfgh");
+					throw new RuntimeException("Message took to long");
 				}
+				else if ((received.getTime() - sent.getTime()) < 0) {
+					throw new RuntimeException("Error message recieved");	
+				}	
 				
+			
 				
+			
 				// print received header
 				System.out.println("Header : " + dateString);
 
@@ -134,7 +144,13 @@ public class DateHourHeaderHandler implements SOAPHandler<SOAPMessageContext> {
 				smc.setScope(CONTEXT_PROPERTY, Scope.APPLICATION);
 
 			}
-		} catch (Exception e) {
+			
+		} catch (RuntimeErrorException re) {
+			
+			throw new RuntimeException();
+		}
+		
+		catch (Exception e) {
 			System.out.print("Caught exception in handleMessage: ");
 			System.out.println(e);
 			System.out.println("Continue normal processing...");
