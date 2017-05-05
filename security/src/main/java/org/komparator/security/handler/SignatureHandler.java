@@ -1,8 +1,15 @@
 package org.komparator.security.handler;
 
 import java.io.ByteArrayOutputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.security.KeyStoreException;
 import java.security.PrivateKey;
 import java.security.PublicKey;
+import java.security.UnrecoverableKeyException;
+import java.security.cert.CertificateException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.Iterator;
 import java.util.Set;
 
@@ -13,6 +20,7 @@ import javax.xml.soap.Node;
 import javax.xml.soap.SOAPBody;
 import javax.xml.soap.SOAPElement;
 import javax.xml.soap.SOAPEnvelope;
+import javax.xml.soap.SOAPException;
 import javax.xml.soap.SOAPHeader;
 import javax.xml.soap.SOAPHeaderElement;
 import javax.xml.soap.SOAPMessage;
@@ -24,9 +32,11 @@ import javax.xml.ws.handler.soap.SOAPMessageContext;
 
 import org.komparator.security.CertUtil;
 import org.komparator.security.CryptoUtil;
+import org.komparator.security.Singleton;
 import org.w3c.dom.NodeList;
 
 import pt.ulisboa.tecnico.sdis.ws.cli.CAClient;
+import pt.ulisboa.tecnico.sdis.ws.cli.CAClientException;
 
 /**
  * This SOAPHandler shows how to set/get values from headers in inbound/outbound
@@ -40,6 +50,7 @@ import pt.ulisboa.tecnico.sdis.ws.cli.CAClient;
 public class SignatureHandler implements SOAPHandler<SOAPMessageContext> {
 
 	public static final String CONTEXT_PROPERTY = "my.property";
+	private SimpleDateFormat dateFormatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS");
 	
 	static String CERTIFICATE = null;
 
@@ -73,27 +84,29 @@ public class SignatureHandler implements SOAPHandler<SOAPMessageContext> {
 	public boolean handleMessage(SOAPMessageContext smc) {
 		
 		Boolean outboundElement = (Boolean) smc.get(MessageContext.MESSAGE_OUTBOUND_PROPERTY);
-
-		String propertyValue = (String) smc.get(CONTEXT_PROPERTY);
 		
-		if (propertyValue.equals("A54_Supplier1")) {
+		System.out.println();
+		System.out.println("\tSupplier Communication");
+		
+		Singleton single = Singleton.getInstance();
+		String wsName = single.getName();
+		
+		if (wsName.equals("A54_Supplier1")) {
 			CERTIFICATE = "A54_Supplier1.cer";
 			KEYSTORE = "A54_Supplier1.jks";
 			KEY_ALIAS = "A54_Supplier1";
 
-		} else if (propertyValue.equals("A54_Supplier2")) {
+		} else if (wsName.equals("A54_Supplier2")) {
 			CERTIFICATE = "A54_Supplier2.cer";
 			KEYSTORE = "A54_Supplier2.jks";
 			KEY_ALIAS = "A54_Supplier2";
 
-		} else if (propertyValue.equals("A54_Supplier3")) {
+		} else if (wsName.equals("A54_Supplier3")) {
 			CERTIFICATE = "A54_Supplier3.cer";
 			KEYSTORE = "A54_Supplier3.jks";
 			KEY_ALIAS = "A54_Supplier3";
 		}
 		
-		System.out.println();
-		System.out.println("\tSupplier Communication");
 		try {
 			if (outboundElement.booleanValue()) {
 				
@@ -101,7 +114,10 @@ public class SignatureHandler implements SOAPHandler<SOAPMessageContext> {
 				System.out.println("\t   OUTBOUND    ");
 				System.out.println("\t---------------");
 				System.out.println();
-
+			
+				privateKey = CertUtil.getPrivateKeyFromKeyStoreResource(KEYSTORE,
+							KEYSTORE_PASSWORD.toCharArray(), KEY_ALIAS, KEY_PASSWORD.toCharArray());
+				
 				// get SOAP envelope
 				SOAPMessage msg = smc.getMessage();
 				SOAPPart sp = msg.getSOAPPart();
@@ -113,31 +129,81 @@ public class SignatureHandler implements SOAPHandler<SOAPMessageContext> {
 				if (sh == null)
 					sh = se.addHeader();
 				
-				QName svcn = (QName) smc.get(MessageContext.WSDL_SERVICE);
-				QName opn = (QName) smc.get(MessageContext.WSDL_OPERATION);
+				// add header element (name, namespace prefix, namespace)
+				Name name = se.createName("wsname", "n", "http://demo");
+				SOAPHeaderElement element2 = sh.addHeaderElement(name);
+				// add header element value
+				String myName = wsName;
+				element2.addTextNode(myName);
 				
-				ByteArrayOutputStream array = new ByteArrayOutputStream();
-				msg.writeTo(array);
-				String aux = array.toString();
-				byte[] plainBytes = DatatypeConverter.parseBase64Binary(aux);
+				// add header element (name, namespace prefix, namespace)
+				Name timestamp = se.createName("timestamp", "t", "http://demo");
+				SOAPHeaderElement element = sh.addHeaderElement(timestamp);
+				// add header element value
+				String dateString = dateFormatter.format(new Date());
+				element.addTextNode(dateString);
 				
-		    	CAClient ca = new CAClient("http://sec.sd.rnl.tecnico.ulisboa.pt:8081/ca");
+				String message = soapMessageToString(msg);
+				byte[] plainMsg = DatatypeConverter.parseBase64Binary(message);
+				byte[] digitalSignature = CryptoUtil.makeDigitalSignature(privateKey, plainMsg);
 				
-				String stringCert = ca.getCertificate(CERTIFICATE);
+				// add header element (name, namespace prefix, namespace)
+				Name diggest = se.createName("signature", "s", "http://demo");
+				SOAPHeaderElement element3 = sh.addHeaderElement(diggest);
+				// add header element value
+				String signature = DatatypeConverter.printBase64Binary(digitalSignature);
+				element3.addTextNode(signature);
 				
-				publicKey = CertUtil.getX509CertificateFromPEMString(stringCert).getPublicKey();
-		    	
-		    	privateKey = CertUtil.getPrivateKeyFromKeyStoreResource(KEYSTORE,
-						KEYSTORE_PASSWORD.toCharArray(), KEY_ALIAS, KEY_PASSWORD.toCharArray());
-		    	
-		    	byte[] signature = CryptoUtil.makeDigitalSignature(privateKey, plainBytes );
-		    	
 			}else {
 				System.out.println("\t---------------");
 				System.out.println("\t   INBOUND     ");
 				System.out.println("\t---------------");
 				System.out.println();
+				
+				// get SOAP envelope header
+				SOAPMessage msg = smc.getMessage();
+				SOAPPart sp = msg.getSOAPPart();
+				SOAPEnvelope se = sp.getEnvelope();
+				SOAPHeader sh = se.getHeader();
 
+				// check header
+				if (sh == null) {
+					System.out.println("Header not found.");
+					return true;
+				}
+
+				// get name element
+				Name name = se.createName("wsname", "n", "http://demo");
+				Iterator it = sh.getChildElements(name);
+				// check header element
+				if (!it.hasNext()) {
+					System.out.println("Header element not found.");
+					return true;
+				}
+				SOAPElement element = (SOAPElement) it.next();
+				String myName = element.getValue();
+				CAClient ca = new CAClient("http://sec.sd.rnl.tecnico.ulisboa.pt:8081/ca");
+				String stringCert = ca.getCertificate(myName + ".cer");
+				publicKey = CertUtil.getX509CertificateFromPEMString(stringCert).getPublicKey();
+				
+				// get signature element
+				Name diggest = se.createName("signature", "s", "http://demo");
+				Iterator it2 = sh.getChildElements(diggest);
+				// check header element
+				if (!it2.hasNext()) {
+					System.out.println("Header element not found.");
+					return true;
+				}
+				SOAPElement element2 = (SOAPElement) it2.next();
+				String sig = element2.getValue();
+				byte[] signature = DatatypeConverter.parseBase64Binary(sig);
+				
+				//message
+				String message = soapMessageToString(msg);
+				byte[] bytesToVerify = DatatypeConverter.parseBase64Binary(message);
+				
+				if ( !CryptoUtil.verifyDigitalSignature(publicKey, bytesToVerify, signature ))
+					throw new RuntimeException();
 				
 				}
 			
@@ -164,6 +230,30 @@ public class SignatureHandler implements SOAPHandler<SOAPMessageContext> {
 	@Override
 	public void close(MessageContext messageContext) {
 		// nothing to clean up
+	}
+	
+	public String soapMessageToString(SOAPMessage msg) {
+		String message = null;
+
+		ByteArrayOutputStream bytesToSign = null;
+		
+		bytesToSign = new ByteArrayOutputStream();
+		try {
+			msg.writeTo(bytesToSign);
+		} catch (SOAPException | IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		message = bytesToSign.toString();
+		
+		try {
+			bytesToSign.close();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		return message;
 	}
 
 }

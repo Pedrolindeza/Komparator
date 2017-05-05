@@ -1,5 +1,7 @@
 package org.komparator.supplier.ws;
 
+import org.komparator.security.Singleton;
+
 /** Main class that starts the Supplier Web Service. */
 public class SupplierApp {
 
@@ -34,6 +36,10 @@ public class SupplierApp {
 		} finally {
 			endpoint.stop();
 		}
+		
+		Singleton single = Singleton.getInstance();
+		single.setName(wsName);
+		
 	}
 
 }

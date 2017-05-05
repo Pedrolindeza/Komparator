@@ -1,5 +1,7 @@
 package org.komparator.supplier.ws.cli;
 
+import org.komparator.security.Singleton;
+
 /** Main class that starts the Supplier Web Service client. */
 public class SupplierClientApp {
 
@@ -32,6 +34,9 @@ public class SupplierClientApp {
 			client = new SupplierClient(uddiURL, wsName);
 			client.setVerbose(true);
 		}
+		
+		Singleton single = Singleton.getInstance();
+		single.setName(wsName);
 			
 		System.out.println("Invoke ping()...");
 		String result = client.ping("client");

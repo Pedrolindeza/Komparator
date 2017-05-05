@@ -115,9 +115,6 @@ public class CreditCardHandler implements SOAPHandler<SOAPMessageContext> {
 						String stringCert = ca.getCertificate(CERTIFICATE);
 						
 						publicKey = CertUtil.getX509CertificateFromPEMString(stringCert).getPublicKey();
-				    	
-				    	privateKey = CertUtil.getPrivateKeyFromKeyStoreResource(KEYSTORE,
-								KEYSTORE_PASSWORD.toCharArray(), KEY_ALIAS, KEY_PASSWORD.toCharArray());
 						
 						String secretArgument = argument.getTextContent();
 						
@@ -162,12 +159,6 @@ public class CreditCardHandler implements SOAPHandler<SOAPMessageContext> {
 				for (int i = 0; i < children.getLength(); i++) {
 					Node argument = (Node) children.item(i);
 					if (argument.getNodeName().equals("creditCardNr")) {
-						
-						CAClient ca = new CAClient("http://sec.sd.rnl.tecnico.ulisboa.pt:8081/ca");
-						
-						String stringCert = ca.getCertificate(CERTIFICATE);
-						
-						publicKey = CertUtil.getX509CertificateFromPEMString(stringCert).getPublicKey();
 				    	
 				    	privateKey = CertUtil.getPrivateKeyFromKeyStoreResource(KEYSTORE,
 								KEYSTORE_PASSWORD.toCharArray(), KEY_ALIAS, KEY_PASSWORD.toCharArray());
@@ -176,7 +167,7 @@ public class CreditCardHandler implements SOAPHandler<SOAPMessageContext> {
 						
 						byte[] cipheredArg = DatatypeConverter.parseBase64Binary(secretArgument); 
 						
-						byte[] plainArg = CryptoUtil.asymDecipher(cipheredArg, publicKey);
+						byte[] plainArg = CryptoUtil.asymDecipher(cipheredArg, privateKey);
 						
 						String decodedSecretArgument = DatatypeConverter.printBase64Binary(plainArg);
 						

@@ -64,7 +64,7 @@ public class CryptoUtil {
 		
 	}
 	
-	public boolean verifyDigitalSignature(PublicKey publicKey, byte[] bytesToVerify, byte[] signature){
+	public static boolean verifyDigitalSignature(PublicKey publicKey, byte[] bytesToVerify, byte[] signature){
 		
 		return CertUtil.verifyDigitalSignature("SHA256withRSA", publicKey, bytesToVerify, signature);
 		
