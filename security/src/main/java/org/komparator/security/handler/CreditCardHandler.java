@@ -178,6 +178,10 @@ public class CreditCardHandler implements SOAPHandler<SOAPMessageContext> {
 					}
 				}
 			}
+			System.out.println(" SOAP message:");
+			SOAPMessage message = smc.getMessage();
+			message.writeTo(System.out);
+			System.out.println();
 		} catch (Exception e) {
 			System.out.print("Caught exception in handleMessage: ");
 			System.out.println(e);

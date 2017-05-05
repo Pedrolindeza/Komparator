@@ -203,12 +203,21 @@ public class SignatureHandler implements SOAPHandler<SOAPMessageContext> {
 					throw new RuntimeException();
 				
 				msg.saveChanges();
-			}			
-		} catch (Exception e) {
+
+			}
+			System.out.println(" SOAP message:");
+			SOAPMessage message = smc.getMessage();
+			message.writeTo(System.out);
+			System.out.println();
+		}	
+		catch (Exception e) {
 			System.out.print("Caught exception in handleMessage: ");
 			System.out.println(e);
 			System.out.println("Continue normal processing...");
 		}
+		
+		
+		
 
 		return true;
 	}

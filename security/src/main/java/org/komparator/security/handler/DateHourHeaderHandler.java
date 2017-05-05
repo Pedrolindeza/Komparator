@@ -144,7 +144,10 @@ public class DateHourHeaderHandler implements SOAPHandler<SOAPMessageContext> {
 				smc.setScope(CONTEXT_PROPERTY, Scope.APPLICATION);
 
 			}
-			
+			System.out.println(" SOAP message:");
+			SOAPMessage message = smc.getMessage();
+			message.writeTo(System.out);
+			System.out.println();
 		} catch (RuntimeErrorException re) {
 			
 			throw new RuntimeException();
