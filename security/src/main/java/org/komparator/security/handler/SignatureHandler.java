@@ -37,7 +37,7 @@ import pt.ulisboa.tecnico.sdis.ws.cli.CAClient;
  * The value that is read from the header is placed in a SOAP message context
  * property that can be accessed by other handlers or by the application.
  */
-public class CreditCardHandler implements SOAPHandler<SOAPMessageContext> {
+public class SignatureHandler implements SOAPHandler<SOAPMessageContext> {
 
 	public static final String CONTEXT_PROPERTY = "my.property";
 	
@@ -112,7 +112,7 @@ public class CreditCardHandler implements SOAPHandler<SOAPMessageContext> {
 						
 						CAClient ca = new CAClient("http://sec.sd.rnl.tecnico.ulisboa.pt:8081/ca");
 						
-						String stringCert = ca.getCertificate(CERTIFICATE);
+						String stringCert = ca.getCertificate("A54_Mediator.cer");
 						
 						publicKey = CertUtil.getX509CertificateFromPEMString(stringCert).getPublicKey();
 				    	

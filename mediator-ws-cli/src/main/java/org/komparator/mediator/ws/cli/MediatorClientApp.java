@@ -1,5 +1,7 @@
 package org.komparator.mediator.ws.cli;
 
+import org.komparator.mediator.ws.ShoppingResultView;
+
 public class MediatorClientApp {
 
     public static void main(String[] args) throws Exception {
@@ -39,6 +41,6 @@ public class MediatorClientApp {
         
         String result = client.ping("client");
         System.out.println(result);
-        
+
     }
 }
