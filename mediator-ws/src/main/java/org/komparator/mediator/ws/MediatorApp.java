@@ -9,6 +9,7 @@ public class MediatorApp {
 			System.err.println("Usage: java " + MediatorApp.class.getName() + " wsURL OR uddiURL wsName wsURL");
 			return;
 		}
+		
 		String uddiURL = null;
 		String wsName = null;
 		String wsURL = null;

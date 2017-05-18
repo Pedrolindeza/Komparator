@@ -4,11 +4,13 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 
 import javax.jws.HandlerChain;
 import javax.jws.WebService;
+
 
 import org.komparator.supplier.ws.BadProductId_Exception;
 import org.komparator.supplier.ws.BadProduct_Exception;
@@ -38,7 +40,9 @@ import pt.ulisboa.tecnico.sdis.ws.uddi.UDDIRecord;
 @HandlerChain(file = "/mediator-ws_handler-chain.xml")
 
 public class MediatorPortImpl implements MediatorPortType {
-
+	
+	Date date;
+	private boolean _isPrim; 
 	// end point manager
 	private MediatorEndpointManager endpointManager;
 
@@ -57,6 +61,13 @@ public class MediatorPortImpl implements MediatorPortType {
 	
 	private void resetShoppingResultView() {
 		this.shoppingResultsList = new ArrayList<ShoppingResultView>();
+	}
+	
+	// getters/setters -------------------------------------------------------
+	
+	public void setIsPrim(boolean isPrim) {
+		
+		_isPrim = isPrim; 
 	}
 
 	// Main operations -------------------------------------------------------
@@ -387,6 +398,7 @@ public class MediatorPortImpl implements MediatorPortType {
 	}
 	
 	
+	
 // Auxiliary operations --------------------------------------------------	
 	
 	
@@ -532,6 +544,18 @@ public class MediatorPortImpl implements MediatorPortType {
 		InvalidText faultInfo = new InvalidText();
 		faultInfo.message = message;
 		throw new InvalidText_Exception(message, faultInfo);
+	}
+
+	@Override
+	public void imAlive() {
+		
+		if(!_isPrim)
+		{
+			 date = new Date();
+			//System.out.println(date.toString());
+		}
+			
+		
 	}
 
 

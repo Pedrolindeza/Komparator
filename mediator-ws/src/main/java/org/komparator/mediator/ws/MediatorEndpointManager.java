@@ -120,15 +120,30 @@ public class MediatorEndpointManager {
 	/* UDDI */
 
 	void publishToUDDI() throws Exception {
+		
+		
 		try {
 			// publish to UDDI
+			
 			if (uddiURL != null) {
 				if (verbose) {
 					System.out.printf("Publishing '%s' to UDDI at %s%n", wsName, uddiURL);
 				}
 				uddiNaming = new UDDINaming(uddiURL);
+				if(uddiNaming.lookup("A54_Mediator") == null) {
+					
+					System.out.println("Mediator Primario");
+					portImpl.setIsPrim(true);
+				}
+				else {
+					
+					System.out.println("Mediator Secundario");
+				}
 				uddiNaming.rebind(wsName, wsURL);
 			}
+			
+			
+				
 		} catch (Exception e) {
 			uddiNaming = null;
 			if (verbose) {
