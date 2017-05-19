@@ -32,24 +32,24 @@ public class MediatorApp {
 		try {
 			endpoint.start();
 			
-			System.out.println(" starting LifeProof ... ");
+			System.out.println("Starting LifeProof ... ");
 
 	        // create timer object
 	        // set it as a daemon so the JVM doesn't wait for it when quitting
-	        Timer timer = new Timer(/*isDaemon*/ true);
+	        endpoint.setTimer(new Timer(/*isDaemon*/ true));
 
 	        // create timer task object
 	        LifeProof life= new LifeProof(endpoint);
 
-	        timer.schedule(life, /*delay*/ 0 * 1000, /*period*/ 5 * 1000);
+	        endpoint.getTimer().schedule(life, /*delay*/ 0 * 1000, /*period*/ 5 * 1000);
 
 	        // sleep 10 seconds, then finish
-	        Thread.sleep(300 * 1000);
-	        System.out.println("LifeProof finished.");
-			
-			
+	        // Thread.sleep(10 * 1000);
+	        //System.out.println("LifeProof finished.");
 			endpoint.awaitConnections();
+			
 		} finally {
+			
 			endpoint.stop();
 		}
 

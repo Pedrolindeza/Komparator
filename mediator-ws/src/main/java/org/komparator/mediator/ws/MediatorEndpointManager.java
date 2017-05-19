@@ -2,6 +2,7 @@ package org.komparator.mediator.ws;
 
 import java.io.IOException;
 import java.util.Date;
+import java.util.Timer;
 
 import javax.xml.ws.Endpoint;
 
@@ -15,6 +16,8 @@ public class MediatorEndpointManager {
 	private String uddiURL = null;
 	/** Web Service name */
 	private String wsName = null;
+	
+	private Timer timer;
 
 	/** Get Web Service UDDI publication name */
 	public String getWsName() {
@@ -133,11 +136,11 @@ public class MediatorEndpointManager {
 			
 			if (uddiURL != null) {
 				if (verbose) {
-					System.out.printf("Publishing '%s' to UDDI at %s%n", wsName, uddiURL);
+					
 				}
 				uddiNaming = new UDDINaming(uddiURL);
 				if(uddiNaming.lookup("A54_Mediator") == null) {
-					
+					System.out.printf("Publishing '%s' to UDDI at %s%n", wsName, uddiURL);
 					System.out.println("Mediator Primario");
 					portImpl.setIsPrim(true);
 				}
@@ -178,6 +181,9 @@ public class MediatorEndpointManager {
 				System.out.printf("Caught exception when unbinding: %s%n", e);
 			}
 		}
+		
+		this.getTimer().cancel();
+		this.getTimer().purge();
 	}
 	
 	public void checkIfAlive(){
@@ -185,11 +191,26 @@ public class MediatorEndpointManager {
 		Date now = new Date();
 		if (now.getTime() - portImpl.date.getTime() > 6000 )
 			try {
-				uddiNaming.rebind(wsName, "http://localhost:8072/mediator-ws/endpoint");
+				
+				System.out.println("Primary Mediator Offline");
+
+				this.getTimer().cancel();
+				this.getTimer().purge();
+				
+				uddiNaming.rebind(wsName, wsURL);
+				System.out.println("Assuming RollPLay");
 			} catch (UDDINamingException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
+	}
+
+	public Timer getTimer() {
+		return timer;
+	}
+
+	public void setTimer(Timer timer) {
+		this.timer = timer;
 	} 
 
 	}
