@@ -138,6 +138,7 @@ public class MediatorEndpointManager {
 				else {
 					
 					System.out.println("Mediator Secundario");
+					return; //duvidas 
 				}
 				uddiNaming.rebind(wsName, wsURL);
 			}

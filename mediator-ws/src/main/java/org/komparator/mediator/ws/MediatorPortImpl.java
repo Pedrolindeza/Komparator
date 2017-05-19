@@ -7,6 +7,7 @@ import java.util.Comparator;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.ListIterator;
 
 import javax.jws.HandlerChain;
 import javax.jws.WebService;
@@ -20,6 +21,8 @@ import org.komparator.supplier.ws.InsufficientQuantity_Exception;
 import org.komparator.supplier.ws.ProductView;
 import org.komparator.supplier.ws.cli.SupplierClient;
 import org.komparator.supplier.ws.cli.SupplierClientException;
+import org.komparator.mediator.ws.cli.MediatorClient;
+import org.komparator.mediator.ws.cli.MediatorClientException;
 
 import pt.ulisboa.tecnico.sdis.ws.cli.CreditCardClient;
 import pt.ulisboa.tecnico.sdis.ws.cli.CreditCardClientException;
@@ -68,6 +71,14 @@ public class MediatorPortImpl implements MediatorPortType {
 	public void setIsPrim(boolean isPrim) {
 		
 		_isPrim = isPrim; 
+	}
+	
+	private void setCartsList(List<CartView> newCarts) {
+		this.cartsList = newCarts;
+	}
+		 
+	private void setShoppingResultView(List<ShoppingResultView> newShoppingView) {
+		this.shoppingResultsList = newShoppingView;
 	}
 
 	// Main operations -------------------------------------------------------
@@ -193,9 +204,9 @@ public class MediatorPortImpl implements MediatorPortType {
 		boolean endPurchases = false;
 		boolean incomplete = false;
 	  
-	  ShoppingResultView shoppingResultView = new ShoppingResultView();
+		ShoppingResultView shoppingResultView = new ShoppingResultView();
 	  
-	  shoppingResultView.setResult(Result.EMPTY);
+		shoppingResultView.setResult(Result.EMPTY);
 	  
 	  
 	  try{
@@ -293,6 +304,7 @@ public class MediatorPortImpl implements MediatorPortType {
 	  	}
 	  	shoppingResultView.setId("PurchaseID: " + cartId + creditCardNr);
 	  	shoppingResultsList.add(shoppingResultView);
+	  	updateShopHistory(shoppingResultView);
 	  	return shoppingResultView;
 
 }
@@ -355,7 +367,7 @@ public class MediatorPortImpl implements MediatorPortType {
 					if(!cartExists){
 						CartView newCart = new CartView();
 						newCart.setCartId(carId);
-						cartsList.add(newCart);
+						
 					}
 					
 					
@@ -371,6 +383,7 @@ public class MediatorPortImpl implements MediatorPortType {
 										
 									}
 									item.setQuantity(item.getQuantity()+itemQty);
+				
 								}
 							}
 							if(!exists){
@@ -385,6 +398,8 @@ public class MediatorPortImpl implements MediatorPortType {
 								//System.out.println(cart.getItems().size());
 								
 							}
+							
+							updateCart(cart);
 						}
 					}
 				} catch(BadProductId_Exception e) {
@@ -394,8 +409,77 @@ public class MediatorPortImpl implements MediatorPortType {
 			
 		}
 		
+	}
+	
+	@Override
+	public void imAlive() {
+		
+		if(!_isPrim)
+		{
+			 date = new Date();
+			//System.out.println(date.toString());
+		}
+			
+	}
+	
+	@Override
+	public void updateShopHistory(ShoppingResultView shoppingResultsProduct) {
+		
+		if(_isPrim)
+		{
+			try {
+			
+				MediatorClient mediatorCli = new MediatorClient("http://localhost:8072/mediator-ws/endpoint");
+				
+				mediatorCli.updateShopHistory(shoppingResultsProduct);
+				
+				
+			
+			} catch (MediatorClientException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+		else
+		{
+			this.shoppingResultsList.add(shoppingResultsProduct);
+		}
 		
 	}
+	
+	
+	@Override
+	public void updateCart(CartView cart) {
+		
+		if(_isPrim)
+		{
+			try {
+			
+				MediatorClient mediatorCli = new MediatorClient("http://localhost:8072/mediator-ws/endpoint");
+				
+				mediatorCli.updateShopHistory(shoppingResultsProduct);
+				
+				
+			
+			} catch (MediatorClientException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+		else
+		{
+			for(ListIterator<CartView> iter = this.cartsList.listIterator(); iter.hasNext();) {
+				if(iter.next().getCartId().equals(cart.getCartId())) {
+				   iter.remove();
+				   
+				  }
+			}
+			this.cartsList.add(cart);
+		}
+		
+		
+	}
+    
 	
 	
 	
@@ -494,7 +578,7 @@ public class MediatorPortImpl implements MediatorPortType {
 		}
 		return suppliers;
 	}
-    
+	
 	// Exception helpers -----------------------------------------------------
 	
 	/** Helper method to throw new EmptyCart exception */
@@ -546,17 +630,10 @@ public class MediatorPortImpl implements MediatorPortType {
 		throw new InvalidText_Exception(message, faultInfo);
 	}
 
-	@Override
-	public void imAlive() {
-		
-		if(!_isPrim)
-		{
-			 date = new Date();
-			//System.out.println(date.toString());
-		}
-			
-		
-	}
+	
+	
+	
+	
 
 
 }
