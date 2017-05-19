@@ -25,9 +25,10 @@ import javax.xml.ws.handler.soap.SOAPMessageContext;
  * The value that is read from the header is placed in a SOAP message context
  * property that can be accessed by other handlers or by the application.
  */
-public class HashCodeHandler implements SOAPHandler<SOAPMessageContext> {
+public class OpIDHandler implements SOAPHandler<SOAPMessageContext> {
 
 	public static final String CONTEXT_PROPERTY = "my.property";
+	public static final String REQUEST_PROPERTY = "my.property";
 
 	//
 	// Handler interface implementation
@@ -46,12 +47,16 @@ public class HashCodeHandler implements SOAPHandler<SOAPMessageContext> {
 	 * The handleMessage method is invoked for normal processing of inbound and
 	 * outbound messages.
 	 */
+	@SuppressWarnings("rawtypes")
 	@Override
 	public boolean handleMessage(SOAPMessageContext smc) {
-		System.out.println("AddHeaderHandler: Handling message.");
-
+		
+		System.out.println();
+		System.out.println("\tOperation Random Value ID");
 		Boolean outboundElement = (Boolean) smc.get(MessageContext.MESSAGE_OUTBOUND_PROPERTY);
-
+		String value =  (String) smc.get(REQUEST_PROPERTY);
+		
+		
 		try {
 			if (outboundElement.booleanValue()) {
 				
@@ -70,16 +75,11 @@ public class HashCodeHandler implements SOAPHandler<SOAPMessageContext> {
 				if (sh == null)
 					sh = se.addHeader();
 				
-				QName opn = (QName) smc.get(MessageContext.WSDL_OPERATION);
-				
 				// add header element (name, namespace prefix, namespace)
-				Name name = se.createName("hashCode", "h", "http://demo");
+				Name name = se.createName("id", "i", "http://demo");
 				SOAPHeaderElement element = sh.addHeaderElement(name);
 
-				// add header element value
-				int hash = opn.hashCode();;
-				String valueString = Integer.toString(hash);
-				element.addTextNode(valueString);
+				element.addTextNode(value);
 				
 				msg.saveChanges();
 
@@ -102,7 +102,7 @@ public class HashCodeHandler implements SOAPHandler<SOAPMessageContext> {
 				}
 
 				// get first header element
-				Name name = se.createName("hashCode", "h", "http://demo");
+				Name name = se.createName("id", "i", "http://demo");
 				Iterator it = sh.getChildElements(name);
 				
 				// check header element
@@ -114,22 +114,22 @@ public class HashCodeHandler implements SOAPHandler<SOAPMessageContext> {
 
 				// get header element value
 				String valueString = element.getValue();
-				int value = Integer.parseInt(valueString);
 
 				// print received header
-				System.out.println("Operation HashCode " + value);
+				if (valueString != null)
+				System.out.println("Random Nº ID" + valueString);
 
 				// put header in a property context
-				smc.put(CONTEXT_PROPERTY, value);
+				smc.put(REQUEST_PROPERTY, value);
 				// set property scope to application client/server class can
 				// access it
 				smc.setScope(CONTEXT_PROPERTY, Scope.APPLICATION);
+				
+				msg.saveChanges();
 
 			}
 		} catch (Exception e) {
-			System.out.print("Caught exception in handleMessage: ");
 			System.out.println(e);
-			System.out.println("Continue normal processing...");
 		}
 
 		return true;

@@ -10,9 +10,11 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.ListIterator;
 
+import javax.annotation.Resource;
 import javax.jws.HandlerChain;
 import javax.jws.WebService;
-
+import javax.xml.ws.WebServiceContext;
+import javax.xml.ws.handler.MessageContext;
 
 import org.komparator.supplier.ws.BadProductId_Exception;
 import org.komparator.supplier.ws.BadProduct_Exception;
@@ -24,6 +26,7 @@ import org.komparator.supplier.ws.cli.SupplierClient;
 import org.komparator.supplier.ws.cli.SupplierClientException;
 import org.komparator.mediator.ws.cli.MediatorClient;
 import org.komparator.mediator.ws.cli.MediatorClientException;
+import org.komparator.security.handler.OpIDHandler;
 
 import pt.ulisboa.tecnico.sdis.ws.cli.CreditCardClient;
 import pt.ulisboa.tecnico.sdis.ws.cli.CreditCardClientException;
@@ -43,7 +46,11 @@ import pt.ulisboa.tecnico.sdis.ws.uddi.UDDIRecord;
 )
 @HandlerChain(file = "/mediator-ws_handler-chain.xml")
 
+
 public class MediatorPortImpl implements MediatorPortType {
+	
+	@Resource
+	private WebServiceContext webServiceContext;
 	
 	Date date;
 	private boolean _isPrim; 
@@ -197,6 +204,10 @@ public class MediatorPortImpl implements MediatorPortType {
 	@Override
 	public ShoppingResultView buyCart(String cartId, String creditCardNr) throws EmptyCart_Exception, InvalidCartId_Exception, InvalidCreditCard_Exception  {
 		
+		MessageContext messageContext= webServiceContext.getMessageContext();
+		String propertyValue=(String) messageContext.get(OpIDHandler.REQUEST_PROPERTY);
+		
+		
 		if (cartId == null || cartId == "\n" || cartId == "\t" || cartId == "" || cartId.trim().length() == 0 ) {
 			throwInvalidCartId("The cart ID you specified is invalid.");
 		}
@@ -318,6 +329,9 @@ public class MediatorPortImpl implements MediatorPortType {
 
 	@Override
 	public void addToCart(String carId, ItemIdView itemId, int itemQty) throws InvalidCartId_Exception, InvalidItemId_Exception, InvalidQuantity_Exception, NotEnoughItems_Exception{
+		
+		MessageContext messageContext= webServiceContext.getMessageContext();
+		String propertyValue=(String) messageContext.get(OpIDHandler.REQUEST_PROPERTY);
 		
 		if(itemId == null) {
 			
