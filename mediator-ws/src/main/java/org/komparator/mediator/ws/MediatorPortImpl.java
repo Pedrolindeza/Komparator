@@ -463,7 +463,7 @@ public class MediatorPortImpl implements MediatorPortType {
 			
 				MediatorClient mediatorCli = new MediatorClient("http://localhost:8072/mediator-ws/endpoint");
 				
-				mediatorCli.updateShopHistory(shoppingResultsProduct);
+				mediatorCli.updateCart(cart);
 				
 				
 			
