@@ -1,5 +1,6 @@
 package org.komparator.mediator.ws;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -69,7 +70,10 @@ public class MediatorPortImpl implements MediatorPortType {
 		
 		_isPrim = isPrim; 
 	}
-
+	
+	public boolean getIsPrim(){
+		return _isPrim;
+	}
 	// Main operations -------------------------------------------------------
 
 	@Override
@@ -552,7 +556,7 @@ public class MediatorPortImpl implements MediatorPortType {
 		if(!_isPrim)
 		{
 			 date = new Date();
-			//System.out.println(date.toString());
+			 System.out.println(date.toString());
 		}
 			
 		

@@ -1,5 +1,7 @@
 package org.komparator.mediator.ws;
 
+import java.util.Timer;
+
 public class MediatorApp {
 
 	public static void main(String[] args) throws Exception {
@@ -29,6 +31,23 @@ public class MediatorApp {
 
 		try {
 			endpoint.start();
+			
+			System.out.println(" starting LifeProof ... ");
+
+	        // create timer object
+	        // set it as a daemon so the JVM doesn't wait for it when quitting
+	        Timer timer = new Timer(/*isDaemon*/ true);
+
+	        // create timer task object
+	        LifeProof life= new LifeProof(endpoint);
+
+	        timer.schedule(life, /*delay*/ 0 * 1000, /*period*/ 5 * 1000);
+
+	        // sleep 10 seconds, then finish
+	        Thread.sleep(300 * 1000);
+	        System.out.println("LifeProof finished.");
+			
+			
 			endpoint.awaitConnections();
 		} finally {
 			endpoint.stop();
