@@ -1,5 +1,6 @@
 package org.komparator.mediator.ws;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -73,12 +74,17 @@ public class MediatorPortImpl implements MediatorPortType {
 		_isPrim = isPrim; 
 	}
 	
+
 	private void setCartsList(List<CartView> newCarts) {
 		this.cartsList = newCarts;
 	}
 		 
 	private void setShoppingResultView(List<ShoppingResultView> newShoppingView) {
 		this.shoppingResultsList = newShoppingView;
+	}
+
+	public boolean getIsPrim(){
+		return _isPrim;
 	}
 
 	// Main operations -------------------------------------------------------
@@ -629,11 +635,6 @@ public class MediatorPortImpl implements MediatorPortType {
 		faultInfo.message = message;
 		throw new InvalidText_Exception(message, faultInfo);
 	}
-
-	
-	
-	
-	
 
 
 }

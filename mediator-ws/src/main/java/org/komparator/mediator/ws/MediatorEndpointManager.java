@@ -1,10 +1,12 @@
 package org.komparator.mediator.ws;
 
 import java.io.IOException;
+import java.util.Date;
 
 import javax.xml.ws.Endpoint;
 
 import pt.ulisboa.tecnico.sdis.ws.uddi.UDDINaming;
+import pt.ulisboa.tecnico.sdis.ws.uddi.UDDINamingException;
 
 /** End point manager */
 public class MediatorEndpointManager {
@@ -27,6 +29,10 @@ public class MediatorEndpointManager {
 
 	/** Obtain Port implementation */
 	public MediatorPortType getPort() {
+		return portImpl;
+	}
+	
+	public MediatorPortImpl getPortImpl(){
 		return portImpl;
 	}
 
@@ -138,7 +144,10 @@ public class MediatorEndpointManager {
 				else {
 					
 					System.out.println("Mediator Secundario");
-					return; //duvidas 
+
+					portImpl.setIsPrim(false);
+					return;
+
 				}
 				uddiNaming.rebind(wsName, wsURL);
 			}
@@ -170,5 +179,17 @@ public class MediatorEndpointManager {
 			}
 		}
 	}
+	
+	public void checkIfAlive(){
+		
+		Date now = new Date();
+		if (now.getTime() - portImpl.date.getTime() > 6000 )
+			try {
+				uddiNaming.rebind(wsName, "http://localhost:8072/mediator-ws/endpoint");
+			} catch (UDDINamingException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+	} 
 
-}
+	}
